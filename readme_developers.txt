@@ -97,7 +97,7 @@ mvn -P desktop -pl engine-core,engine-desktop clean integration-test
   Note: This requires first setting an environment variable to tell the
   engine where to find resources (they're not in "engine-desktop/target/").
 
-    Unix: export OVERDRIVE_APP_PATH=/.../Overdrive_Test
+    Unix: export OVERDRIVE_APP_PATH="/.../Overdrive_Test";
     Win:  SET OVERDRIVE_APP_PATH=C:\...\Overdrive_Test
 
 

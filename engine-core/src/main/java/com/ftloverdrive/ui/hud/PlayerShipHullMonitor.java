@@ -56,7 +56,7 @@ public class PlayerShipHullMonitor extends Actor implements PropertiesObserver {
 		batch.flush();
 		if ( clipBegin( this.getX()+11, this.getY(), barClipWidth, bgSprite.getHeight() ) ) {
 			barSprite.setPosition( this.getX()+11, this.getY() + bgSprite.getHeight()/2 - barSprite.getHeight()/2 );
-			barSprite.setColor( 0.47f, 1f, 0.47f, 1f * parentAlpha );
+			barSprite.setColor( 0.47f, 1f, 0.47f, 1f );
 			barSprite.draw( batch, parentAlpha );
 			batch.flush();
 			clipEnd();

@@ -112,7 +112,17 @@ public class TestScreen implements Screen {
 			@Override
 			public void ticksAccumulated( TickEvent e ) {
 				//System.out.println( "Tick ("+ e.getTickCount() +")" );
-				playerShipModel.getProperties().incrementInt( "Hull", 1 );
+
+				int hull = playerShipModel.getProperties().getInt( "Hull" );
+				int hullMax = playerShipModel.getProperties().getInt( "HullMax" );
+				if ( hull < hullMax ) {
+					playerShipModel.getProperties().incrementInt( "Hull", 1 );
+				}
+
+				// Eventually a PropertyEvent would have an INC_IF_LESS_THAN flag
+				// or something. Or maybe a sentinel event listener - set to watch
+				// certain property names - vetoing attempts to increment beyond
+				// the names' associated maxes?
 			}
 		});
 	}
@@ -175,8 +185,8 @@ public class TestScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		playerShipHullMonitor.dispose();
 		hudStage.dispose();
+		playerShipHullMonitor.dispose();
 		game.getAssetManager().unload( MISC_ATLAS );
 		game.getAssetManager().unload( PEOPLE_ATLAS );
 	}

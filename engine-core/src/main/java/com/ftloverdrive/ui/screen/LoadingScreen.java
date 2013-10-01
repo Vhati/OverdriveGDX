@@ -142,14 +142,14 @@ public class LoadingScreen implements Screen {
 		Gdx.gl.glClear( GL10.GL_COLOR_BUFFER_BIT );
 
 		// Incrementally load assets until completely done.
-		if ( loadingAssetManager.update() && game.getAssetManager().update() ) {
+		if ( game.getAssetManager().update() ) {
 			//if ( Gdx.input.isTouched() ) {
 				game.getScreenManager().continueToNextScreen();
 			//}
 		}
 
 		// Interpolate the percentage to make it more smooth.
-		progress = ( loadingAssetManager.getProgress() + game.getAssetManager().getProgress() ) / 2;
+		progress = game.getAssetManager().getProgress();
 		percent = Interpolation.linear.apply( percent, progress, 0.1f );
 
 		loadingBarHidden.setX( startX + endX * percent );
@@ -177,8 +177,7 @@ public class LoadingScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		atlas.dispose();
-		loadingAssetManager.clear();
 		stage.dispose();
+		loadingAssetManager.dispose();
 	}
 }
