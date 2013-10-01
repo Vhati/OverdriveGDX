@@ -30,6 +30,7 @@ import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.model.ship.TestShipModel;
 import com.ftloverdrive.script.OVDScriptManager;
+import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.ui.hud.PlayerShipHullMonitor;
 import com.ftloverdrive.ui.screen.OVDStageManager;
 
@@ -37,10 +38,12 @@ import com.ftloverdrive.core.OverdriveGame;
 
 
 public class TestScreen implements Screen {
+	protected static final String BKG_ATLAS = "img/stars/bg-dullstars-bigcols5.atlas";
 	protected static final String MISC_ATLAS = "img/misc/pack.atlas";
 	protected static final String PEOPLE_ATLAS = "img/people/pack.atlas";
 
 	private Logger log;
+	private TextureAtlas bgAtlas;
 	private TextureAtlas miscAtlas;
 	private TextureAtlas peopleAtlas;
 	private Map<String,TextureRegion> texturesMap;
@@ -52,12 +55,14 @@ public class TestScreen implements Screen {
 	private float elapsed = 0;
 
 	private InputMultiplexer inputMultiplexer;
+	private Stage mainStage;
 	private Stage hudStage;
 
 	private OVDStageManager stageManager;
 	private OVDEventManager eventManager;
 	private OVDScriptManager scriptManager;
 
+	private ShatteredImage bgImage;
 	private Sprite driftSprite;
 	private PlayerShipHullMonitor playerShipHullMonitor;
 
@@ -72,12 +77,22 @@ public class TestScreen implements Screen {
 		eventManager = new OVDEventManager();
 		scriptManager = new OVDScriptManager();
 
+		mainStage = new Stage();
+		stageManager.putStage( "Main", mainStage );
 		hudStage = new Stage();
 		stageManager.putStage( "HUD", hudStage );
 
+		game.getAssetManager().load( BKG_ATLAS, TextureAtlas.class );
 		game.getAssetManager().load( MISC_ATLAS, TextureAtlas.class );
 		game.getAssetManager().load( PEOPLE_ATLAS, TextureAtlas.class );
 		game.getAssetManager().finishLoading();
+
+		bgAtlas = game.getAssetManager().get( BKG_ATLAS, TextureAtlas.class );
+		bgImage = new ShatteredImage( bgAtlas.findRegions( "bg-dullstars" ), 5 );
+		bgImage.setFillParent( true );
+		bgImage.setPosition( 0, 0 );
+		mainStage.addActor( bgImage );
+
 		miscAtlas = game.getAssetManager().get( MISC_ATLAS, TextureAtlas.class );
 		driftSprite = miscAtlas.createSprite( "crosshairs-placed" );
 
@@ -158,6 +173,10 @@ public class TestScreen implements Screen {
 		if ( renderedPreviousFrame )
 			elapsed += delta;
 
+		mainStage.act( Gdx.graphics.getDeltaTime() );
+		mainStage.draw();
+
+
 		batch.begin();
 		driftSprite.setPosition( 100+100*(float)Math.cos(elapsed), 100+25*(float)Math.sin(elapsed) );
 		driftSprite.draw( batch );
@@ -187,6 +206,7 @@ public class TestScreen implements Screen {
 	public void dispose() {
 		hudStage.dispose();
 		playerShipHullMonitor.dispose();
+		game.getAssetManager().unload( BKG_ATLAS );
 		game.getAssetManager().unload( MISC_ATLAS );
 		game.getAssetManager().unload( PEOPLE_ATLAS );
 	}
