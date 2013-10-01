@@ -14,6 +14,8 @@ import com.badlogic.gdx.utils.Array;
  * Usage:
  *   Array<TextureRegion> tiles = atlas.findRegions( "main-base2" );
  *   ShatteredImage bigImage = new ShatteredImage( tiles, 5 );
+ *   bigImage.setFillParent( true );
+ *   stage.addActor( bigImage );
  */
 public class ShatteredImage extends Table {
 	protected Array<Image> tileImages;
