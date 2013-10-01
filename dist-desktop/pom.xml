@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.ftlfans</groupId>
+		<artifactId>overdrive</artifactId>
+		<version>0.1-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>overdrive-dist-desktop</artifactId>
+	<packaging>pom</packaging>
+	<name>Overdrive Desktop</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.ftlfans</groupId>
+			<artifactId>overdrive-engine-desktop</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.ftlfans</groupId>
+			<artifactId>overdrive-packer</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.8</version>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>com.ftlfans</groupId>
+									<artifactId>overdrive-engine-desktop</artifactId>
+									<version>${project.version}</version>
+									<classifier>jar-with-dependencies</classifier>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+									<destFileName>overdrive-engine-desktop.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.ftlfans</groupId>
+									<artifactId>overdrive-packer</artifactId>
+									<version>${project.version}</version>
+									<classifier>jar-with-dependencies</classifier>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+									<destFileName>overdrive-packer.jar</destFileName>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}/wars</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4</version>  <!-- Plexus Archiver had bad tar support before. -->
+				<dependencies>
+					<dependency> <!-- Newer Archiver than required fixing tar bugs. -->
+						<groupId>org.codehaus.plexus</groupId>
+						<artifactId>plexus-archiver</artifactId>
+						<version>2.4.3</version>
+					</dependency>
+					<dependency> <!-- Newer IO than Archiver required fixing another bug. -->
+						<groupId>org.codehaus.plexus</groupId>
+						<artifactId>plexus-io</artifactId>
+						<version>2.0.8</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>  <!-- Build zip archive. -->
+						<id>dist-win</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/dist-win.xml</descriptor>
+							</descriptors>
+							<finalName>${project.name} v${project.version}-Win</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
+						</configuration>
+					</execution>
+					<execution>  <!-- Build tar.gz archive. -->
+						<id>dist-unix</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/dist-unix.xml</descriptor>
+							</descriptors>
+							<finalName>${project.name} v${project.version}-Unix</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

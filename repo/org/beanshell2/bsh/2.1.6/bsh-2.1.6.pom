@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.beanshell2</groupId>
+    <artifactId>bsh</artifactId>
+    <packaging>jar</packaging>
+    <name>BeanShell2</name>
+    <version>2.1.6</version>
+    <description>BeanShell2 is a small, free, embeddable Java source interpreter with object scripting language features,
+        written in Java. BeanShell dynamically executes standard Java syntax and extends it with common scripting
+        conveniences such as loose types, commands, and method closures like those in Perl and JavaScript.
+    </description>
+    <url>http://code.google.com/p/beanshell2/</url>
+    <licenses>
+        <license>
+            <name>GNU LESSER GENERAL PUBLIC LICENSE</name>
+            <url>http://www.gnu.org/copyleft/lesser.html</url>
+        </license>
+    </licenses>
+    <scm>
+        <url>http://beanshell2.googlecode.com/svn/trunk</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>jodeleit</id>
+            <name>Peter Jodeleit</name>
+        </developer>
+    </developers>
+</project>

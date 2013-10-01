@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.ftlfans</groupId>
+		<artifactId>overdrive</artifactId>
+		<version>0.1-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>overdrive-packer</artifactId>
+	<packaging>jar</packaging>
+	<name>Overdrive Packer</name>
+
+	<properties>
+		<mainClass>com.ftloverdrive.packer.OverdrivePacker</mainClass>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.badlogicgames.gdx</groupId>
+			<artifactId>gdx</artifactId>
+			<version>${gdx.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.badlogicgames.gdx</groupId>
+			<artifactId>gdx-tools</artifactId>
+			<version>${gdx.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<phase>integration-test</phase>
+						<configuration>
+							<target>
+								<java dir="${project.build.directory}" fork="true" classname="${mainClass}" classpathref="maven.test.classpath">
+								</java>
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4</version>  <!-- Plexus Archiver had bad tar support before. -->
+				<dependencies>
+					<dependency> <!-- Newer Archiver than required fixing tar bugs. -->
+						<groupId>org.codehaus.plexus</groupId>
+						<artifactId>plexus-archiver</artifactId>
+						<version>2.4.3</version>
+					</dependency>
+					<dependency> <!-- Newer IO than Archiver required fixing another bug. -->
+						<groupId>org.codehaus.plexus</groupId>
+						<artifactId>plexus-io</artifactId>
+						<version>2.0.8</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>  <!-- Build jar. -->
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptorRefs>
+								<!-- Set the classifier for the new attached artifact. -->
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							<archive>
+								<manifest>
+									<mainClass>${mainClass}</mainClass>
+								</manifest>
+							</archive>
+							<!-- <finalName>overdrive-packer</finalName>  -->
+							<appendAssemblyId>true</appendAssemblyId>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
