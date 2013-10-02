@@ -120,6 +120,7 @@ public class OverdriveGame implements ApplicationListener {
 		if ( currentScreen != null ) currentScreen.hide();
 
 		currentScreen = screen;
+		if ( currentScreen != null ) currentScreen.show();
 	}
 
 	public Screen getScreen() {

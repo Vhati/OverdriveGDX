@@ -7,15 +7,14 @@ import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL10;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -46,9 +45,6 @@ public class TestScreen implements Screen {
 	private TextureAtlas bgAtlas;
 	private TextureAtlas miscAtlas;
 	private TextureAtlas peopleAtlas;
-	private Map<String,TextureRegion> texturesMap;
-	private PixmapPacker packer;
-	private Animation walkAnim;
 	private SpriteBatch batch;
 
 	private boolean renderedPreviousFrame = false;
@@ -62,8 +58,8 @@ public class TestScreen implements Screen {
 	private OVDEventManager eventManager;
 	private OVDScriptManager scriptManager;
 
-	private ShatteredImage bgImage;
 	private Sprite driftSprite;
+	private Animation walkAnim;
 	private PlayerShipHullMonitor playerShipHullMonitor;
 
 	private OverdriveGame game;
@@ -88,7 +84,7 @@ public class TestScreen implements Screen {
 		game.getAssetManager().finishLoading();
 
 		bgAtlas = game.getAssetManager().get( BKG_ATLAS, TextureAtlas.class );
-		bgImage = new ShatteredImage( bgAtlas.findRegions( "bg-dullstars" ), 5 );
+		ShatteredImage bgImage = new ShatteredImage( bgAtlas.findRegions( "bg-dullstars" ), 5 );
 		bgImage.setFillParent( true );
 		bgImage.setPosition( 0, 0 );
 		mainStage.addActor( bgImage );
@@ -122,6 +118,7 @@ public class TestScreen implements Screen {
 
 		inputMultiplexer = new InputMultiplexer();
 		inputMultiplexer.addProcessor( hudStage );
+		inputMultiplexer.addProcessor( mainStage );
 
 		eventManager.addTickListener(new TickListener() {
 			@Override

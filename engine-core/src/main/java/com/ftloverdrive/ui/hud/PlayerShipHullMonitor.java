@@ -94,6 +94,7 @@ public class PlayerShipHullMonitor extends Actor implements PropertiesObserver {
 	}
 
 
+	// Actors don't normally have a dispose().
 	public void dispose() {
 		game.getAssetManager().unload( STATUSUI_ATLAS );
 	}
