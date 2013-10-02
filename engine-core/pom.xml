@@ -20,6 +20,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.badlogicgames.gdx</groupId>
+			<artifactId>gdx-freetype</artifactId>
+			<version>${gdx.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.beanshell2</groupId>
 			<artifactId>bsh</artifactId>
 			<version>${beanshell2.version}</version>

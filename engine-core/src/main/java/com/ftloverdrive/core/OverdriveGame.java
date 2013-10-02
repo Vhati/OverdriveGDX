@@ -16,12 +16,14 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Logger;
 
+import com.ftloverdrive.io.FreeTypeFontLoader;
 import com.ftloverdrive.io.RelativeFileHandleResolver;
 import com.ftloverdrive.io.URIFileHandleResolver;
 import com.ftloverdrive.ui.screen.OVDScreenManager;
@@ -88,6 +90,7 @@ public class OverdriveGame implements ApplicationListener {
 		fileHandleResolver.addDefaultResolver( new InternalFileHandleResolver() );
 
 		assetManager = new AssetManager( fileHandleResolver );
+		assetManager.setLoader( BitmapFont.class, new FreeTypeFontLoader( fileHandleResolver ) );
 
 		screenManager = new OVDScreenManager( this );
 
