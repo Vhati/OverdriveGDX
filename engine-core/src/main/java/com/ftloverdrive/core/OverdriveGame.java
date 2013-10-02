@@ -8,6 +8,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.ExternalFileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
@@ -99,7 +100,35 @@ public class OverdriveGame implements ApplicationListener {
 
 
 	/**
+	 * Returns the main FileHandleResolver.
+	 *
+	 * Usage:
+	 *   FileHandle fh = getFileHandleResolver().resolve( pathString );
+	 *   // If you need a File object...
+	 *   File f = fh.file();
+	 *
+	 * Given a string, this resolver will look in several locations.
+	 *   {current_dir|APP_PATH}/resources/...
+	 *   {current_dir|APP_PATH}/...
+	 *   {internal}/...
+	 *
+	 * If a URI prefix is found, that will be stripped, and a specific
+	 * location will be checked instead.
+	 *   internal://... - Root of the jar, and current dir on desktop.
+	 *   external://... - Android SD card, or desktop user's home dir.
+	 */
+	public FileHandleResolver getFileHandleResolver() {
+		return fileHandleResolver;
+	}
+
+	/**
 	 * Returns a manager to load assets.
+	 *
+	 * This one can load ttf fonts:
+	 *   String assetString = ".../myfont.ttf?size=10";
+	 *   assetManager.load( assetString, BitmapFont.class );
+	 *   assetManager.finishLoading();
+	 *   BitmapFont font = assetManager.get( assetString, BitmapFont.class );
 	 */
 	public AssetManager getAssetManager() {
 		return assetManager;
