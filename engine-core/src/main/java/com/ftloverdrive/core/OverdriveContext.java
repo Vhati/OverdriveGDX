@@ -15,6 +15,8 @@ import com.ftloverdrive.ui.screen.OVDStageManager;
 /**
  * A means to pass the numerous managers around, especially to callbacks.
  *
+ * TODO: Decide how best to use this thing.
+ *
  * This should be preferred over globals.
  * It's not necessary to set every value.
  *
@@ -49,6 +51,16 @@ public class OverdriveContext implements Poolable {
 	 * @see com.badlogic.gdx.utils.ReflectionPool
 	 */
 	public OverdriveContext() {
+	}
+
+	/**
+	 * Pseudo constructor for new and reused objects.
+	 * This is capable of accepting args to set initial values.
+	 *
+	 * Always call this after obtaining a reused object from a Pool.
+	 * Subclasses overriding this must call super.init();
+	 */
+	public void init() {
 	}
 
 	/**
