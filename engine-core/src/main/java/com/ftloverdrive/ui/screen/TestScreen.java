@@ -21,6 +21,7 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
@@ -180,6 +181,15 @@ public class TestScreen implements Screen {
 	public void resize( int width, int height ) {
 		hudStage.setViewport( width, height, true );
 		// TODO: Re-layout Stages.
+
+		// SpriteBatches get resized to match the new aspect ratio,
+		// need to counteract this.
+		// http://stackoverflow.com/questions/14085212/libgdx-framebuffer-scaling
+
+		playerShipHullMonitor.setPosition( 0, hudStage.getHeight()-playerShipHullMonitor.getHeight() );
+		Matrix4 matrix = new Matrix4();
+		matrix.setToOrtho2D( 0, 0, width, height );
+		batch.setProjectionMatrix( matrix );
 	}
 
 	@Override
