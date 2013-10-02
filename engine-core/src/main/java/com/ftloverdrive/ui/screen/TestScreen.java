@@ -1,21 +1,15 @@
 package com.ftloverdrive.ui.screen;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -156,6 +150,14 @@ public class TestScreen implements Screen {
 		inputMultiplexer = new InputMultiplexer();
 		inputMultiplexer.addProcessor( hudStage );
 		inputMultiplexer.addProcessor( mainStage );
+
+		try {
+			FileHandleResolver resolver = game.getFileHandleResolver();
+			//scriptManager.eval( resolver.resolve( "script.java" ) );
+		}
+		catch ( Exception e ) {
+			log.error( "Error evaluating script.", e );
+		}
 
 		eventManager.addTickListener(new TickListener() {
 			@Override
