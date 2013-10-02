@@ -1,9 +1,12 @@
 package com.ftloverdrive.packer;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -97,7 +100,7 @@ public class OverdrivePacker {
 		}
 
 
-		JOptionPane.showMessageDialog( null, "Now choose a dir (probably this one)\nin which to create Overdrive's 'resources' folder.\nAny existing 'resources' folder will be deleted.", "Destination", JOptionPane.INFORMATION_MESSAGE );
+		JOptionPane.showMessageDialog( null, "Choose a dir (probably this one)\nin which to create Overdrive's 'resources' folder.\nAny existing 'resources' folder will be deleted.", "Destination", JOptionPane.INFORMATION_MESSAGE );
 
 		JFileChooser packChooser = new JFileChooser();
 		packChooser.setDialogTitle( "Choose a dir to contain resources folder" );
@@ -116,6 +119,8 @@ public class OverdrivePacker {
 		File resDatFile = new File( datsDir, "resource.dat" );
 
 		FTLDat.FTLPack resP = null;
+		InputStream is = null;
+		OutputStream os = null;
 		try {
 			resP = new FTLDat.FTLPack( resDatFile, "r" );
 
@@ -138,6 +143,27 @@ public class OverdrivePacker {
 				dirInnerPathsMap.get( dirPath ).add( innerPath );
 			}
 
+
+			// Copy fonts.
+			for ( String innerPath : dirInnerPathsMap.get( "fonts/" ) ) {
+				File dstFile = new File( outputDir, innerPath );
+				dstFile.getParentFile().mkdirs();
+
+				is = resP.getInputStream( innerPath );
+				os = new BufferedOutputStream( new FileOutputStream( dstFile ) );
+
+				byte[] buf = new byte[4096];
+				int len;
+				while ( (len = is.read(buf)) >= 0 ) {
+					os.write( buf, 0, len );
+				}
+
+				is.close();
+				os.close();
+			}
+
+
+			// Pack images.
 			for ( Map.Entry<String,List<String>> entry : dirInnerPathsMap.entrySet() ) {
 				String dirPath = entry.getKey();
 				List<String> dirPaths = entry.getValue();
@@ -215,6 +241,12 @@ public class OverdrivePacker {
 			e.printStackTrace();
 		}
 		finally {
+			try {if ( is != null ) is.close();}
+			catch ( IOException e ) {}
+
+			try {if ( os != null ) os.close();}
+			catch ( IOException e ) {}
+
 			try {if ( resP != null ) resP.close();}
 			catch ( IOException e ) {}
 		}
