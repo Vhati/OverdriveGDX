@@ -218,6 +218,8 @@ public class OverdrivePacker {
 			try {if ( resP != null ) resP.close();}
 			catch ( IOException e ) {}
 		}
+
+		System.out.println( "\nPacking finished!" );
 	}
 
 
