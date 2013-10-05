@@ -96,5 +96,6 @@ public class OVDEventManager {
 				((TickListener)listeners[i+1]).ticksAccumulated( event );
 			}
 		}
+		tickEventPool.free( event );
 	}
 }
