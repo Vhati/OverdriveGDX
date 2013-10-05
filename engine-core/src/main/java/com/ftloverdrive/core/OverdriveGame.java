@@ -29,6 +29,7 @@ import com.ftloverdrive.io.RelativeFileHandleResolver;
 import com.ftloverdrive.io.URIFileHandleResolver;
 import com.ftloverdrive.ui.screen.OVDScreenManager;
 import com.ftloverdrive.util.FTLUtilities;
+import com.ftloverdrive.util.OVDReferenceManager;
 
 
 public class OverdriveGame implements ApplicationListener {
@@ -48,6 +49,7 @@ public class OverdriveGame implements ApplicationListener {
 
 	private AssetManager assetManager;
 	private OVDScreenManager screenManager;
+	private OVDReferenceManager refManager;
 	private Screen currentScreen = null;
 
 
@@ -89,6 +91,8 @@ public class OverdriveGame implements ApplicationListener {
 		fileHandleResolver.addDefaultResolver( new RelativeFileHandleResolver( resourcesDir ) );
 		fileHandleResolver.addDefaultResolver( new RelativeFileHandleResolver( appDir ) );
 		fileHandleResolver.addDefaultResolver( new InternalFileHandleResolver() );
+
+		refManager = new OVDReferenceManager();
 
 		assetManager = new AssetManager( fileHandleResolver );
 		assetManager.setLoader( BitmapFont.class, new FreeTypeFontLoader( fileHandleResolver ) );
@@ -139,6 +143,13 @@ public class OverdriveGame implements ApplicationListener {
 	 */
 	public OVDScreenManager getScreenManager() {
 		return screenManager;
+	}
+
+	/**
+	 * Returns a manager to link objects together by reference ids.
+	 */
+	public OVDReferenceManager getReferenceManager() {
+		return refManager;
 	}
 
 

@@ -10,12 +10,11 @@ import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.script.OVDScriptManager;
 import com.ftloverdrive.ui.screen.OVDScreenManager;
 import com.ftloverdrive.ui.screen.OVDStageManager;
+import com.ftloverdrive.util.OVDReferenceManager;
 
 
 /**
  * A means to pass the numerous managers around, especially to callbacks.
- *
- * TODO: Decide how best to use this thing.
  *
  * This should be preferred over globals.
  * It's not necessary to set every value.
@@ -40,6 +39,7 @@ public class OverdriveContext implements Poolable {
 	protected FileHandleResolver resolver = null;
 	protected AssetManager assetManager = null;
 	protected OVDScreenManager screenManager = null;
+	protected OVDReferenceManager refManager = null;
 
 	protected OVDEventManager screenEventManager = null;
 	protected OVDScriptManager screenScriptManager = null;
@@ -76,6 +76,7 @@ public class OverdriveContext implements Poolable {
 		this.resolver = game.getFileHandleResolver();
 		this.assetManager = game.getAssetManager();
 		this.screenManager = game.getScreenManager();
+		this.refManager = game.getReferenceManager();
 	}
 
 	/**
@@ -88,6 +89,7 @@ public class OverdriveContext implements Poolable {
 		this.resolver = context.getFileHandleResolver();
 		this.assetManager = context.getAssetManager();
 		this.screenManager = context.getScreenManager();
+		this.refManager = context.getReferenceManager();
 
 		this.screenEventManager = null;
 		this.screenScriptManager = null;
@@ -111,7 +113,9 @@ public class OverdriveContext implements Poolable {
 	}
 
 	public FileHandleResolver getFileHandleResolver() {
-		return resolver;
+		if ( resolver != null ) return resolver;
+		else if ( game != null ) return game.getFileHandleResolver();
+		else return null;
 	}
 
 
@@ -120,7 +124,9 @@ public class OverdriveContext implements Poolable {
 	}
 
 	public AssetManager getAssetManager() {
-		return assetManager;
+		if ( assetManager != null )return assetManager;
+		else if ( game != null ) return game.getAssetManager();
+		else return null;
 	}
 
 
@@ -129,7 +135,19 @@ public class OverdriveContext implements Poolable {
 	}
 
 	public OVDScreenManager getScreenManager() {
-		return screenManager;
+		if ( screenManager != null ) return screenManager;
+		else if ( game != null ) return game.getScreenManager();
+		else return null;
+	}
+
+	public void setReferenceManager( OVDReferenceManager refManager ) {
+		this.refManager = refManager;
+	}
+
+	public OVDReferenceManager getReferenceManager() {
+		if ( refManager != null ) return refManager;
+		else if ( game != null ) return game.getReferenceManager();
+		else return null;
 	}
 
 
