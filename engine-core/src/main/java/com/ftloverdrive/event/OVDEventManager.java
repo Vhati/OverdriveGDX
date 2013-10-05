@@ -14,11 +14,16 @@ import com.ftloverdrive.event.TickListener;
 
 /**
  * Queues and dispatches OVDEvents.
+ *
+ * TODO: Maybe coalesce repeat events when posting, like in
+ * java.awt.EventQueue?
  */
 public class OVDEventManager {
 
-	private Deque<OVDEvent> eventQueue = new LinkedBlockingDeque<OVDEvent>();
-	OVDEventListenerList listenerList = new OVDEventListenerList();
+	private Deque<OVDEvent> outQueue = new LinkedBlockingDeque<OVDEvent>();
+	private Deque<OVDEvent> inQueue = new LinkedBlockingDeque<OVDEvent>();
+	OVDEventListenerList outListenerList = new OVDEventListenerList();
+	OVDEventListenerList inListenerList = new OVDEventListenerList();
 
 	private final int tickRate = 1000;  // Milliseconds per tick of game-time.
 	private int spareTime = 0;          // Remembers leftover milliseconds between ticks.
@@ -37,30 +42,43 @@ public class OVDEventManager {
 	 */
 	public void processEvents() {
 		OVDEvent event;
-		while ( (event = eventQueue.poll()) != null ) {
+		while ( (event = inQueue.poll()) != null ) {
 			if ( event instanceof TickEvent ) {
 				processTickEvent( (TickEvent)event );
+			}
+		}
+		while ( (event = outQueue.poll()) != null ) {
+			// TODO: A registry of handlers to dispatch various event types.
+			// Otherwise this will just be a hardcoded if/else instance check.
+
+			if ( !event.isCancelled() ) {
+				// Pretend it went to the server and back.
+				postDelayedInboundEvent( event );
 			}
 		}
 	}
 
 
 	/**
-	 * Adds an event to the end of the queue. (thread-safe)
+	 * Adds an event to the end of the inbound queue. (thread-safe)
+	 * This should not normally be used.
 	 */
-	public void postDelayedEvent( OVDEvent e ) {
-		// TODO: Maybe coalesce repeat events, like in java.awt.EventQueue?
-
-		eventQueue.addLast( e );
+	public void postDelayedInboundEvent( OVDEvent e ) {
+		inQueue.addLast( e );
 	}
 
 	/**
-	 * Adds an event to the start of the queue. (thread-safe)
+	 * Adds an event to the end of the outbound queue. (thread-safe)
+	 */
+	public void postDelayedEvent( OVDEvent e ) {
+		outQueue.addLast( e );
+	}
+
+	/**
+	 * Adds an event to the start of the outbound queue. (thread-safe)
 	 */
 	public void postPreemptiveEvent( OVDEvent e ) {
-		// TODO: Maybe coalesce repeat events, like in java.awt.EventQueue?
-
-		eventQueue.addFirst( e );
+		outQueue.addFirst( e );
 	}
 
 
@@ -77,20 +95,22 @@ public class OVDEventManager {
 			TickEvent tickEvent = tickEventPool.obtain();
 			tickEvent.init();
 			tickEvent.setTickCount( elapsedTicks );
-			postDelayedEvent( tickEvent );
+
+			// Pretend the server issued this event.
+			postDelayedInboundEvent( tickEvent );
 		}
 	}
 
 	public void addTickListener( TickListener l ) {
-		listenerList.add( TickListener.class, l );
+		inListenerList.add( TickListener.class, l );
 	}
 
 	public void removeTickListener( TickListener l ) {
-		listenerList.remove( TickListener.class, l );
+		inListenerList.remove( TickListener.class, l );
 	}
 
 	protected void processTickEvent( TickEvent event ) {
-		Object[] listeners = listenerList.getListenerList();
+		Object[] listeners = inListenerList.getListenerList();
 		for ( int i = listeners.length-2; i >= 0; i-=2 ) {
 			if ( listeners[i] == TickListener.class ) {
 				((TickListener)listeners[i+1]).ticksAccumulated( event );
