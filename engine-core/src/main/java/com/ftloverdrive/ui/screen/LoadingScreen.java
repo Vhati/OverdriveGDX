@@ -3,34 +3,37 @@
 
 package com.ftloverdrive.ui.screen;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL10;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.Pools;
 
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.event.OVDEventManager;
+import com.ftloverdrive.script.OVDScriptManager;
+import com.ftloverdrive.ui.screen.OVDScreen;
+import com.ftloverdrive.ui.screen.OVDStageManager;
 
 
-public class LoadingScreen implements Screen {
+public class LoadingScreen implements Disposable, OVDScreen {
 	private Logger log;
 
 	private AssetManager loadingAssetManager;
 	private TextureAtlas atlas;
+
+	private OVDStageManager stageManager = null;
+	private OVDEventManager eventManager = null;
+	private OVDScriptManager scriptManager = null;
+
+	private Stage mainStage;
 
 	private Image logo;
 	private Image loadingFrame;
@@ -38,7 +41,6 @@ public class LoadingScreen implements Screen {
 	private Image screenBg;
 	private Image loadingBg;
 	private Actor loadingBar;
-	private Stage stage;
 
 	private float startX, endX;
 	private float progress, percent;
@@ -50,8 +52,16 @@ public class LoadingScreen implements Screen {
 	public LoadingScreen( OverdriveContext srcContext ) {
 		this.context = Pools.get( OverdriveContext.class ).obtain();
 		this.context.init( srcContext );
+		this.context.setScreen( this );
 
 		log = new Logger( LoadingScreen.class.getCanonicalName(), Logger.INFO );
+
+		stageManager = new OVDStageManager();
+		eventManager = new OVDEventManager();
+		scriptManager = new OVDScriptManager();
+
+		mainStage = new Stage();
+		stageManager.putStage( "Main", mainStage );
 
 		loadingAssetManager = new AssetManager();
 		loadingAssetManager.load( "overdrive-assets/images/loading.pack", TextureAtlas.class );
@@ -72,13 +82,12 @@ public class LoadingScreen implements Screen {
 		// Static bar.
 		loadingBar = new Image( atlas.findRegion("loading-bar1") );
 
-		stage = new Stage();
-		stage.addActor( screenBg );
-		stage.addActor( loadingBar );
-		stage.addActor( loadingBg );
-		stage.addActor( loadingBarHidden );
-		stage.addActor( loadingFrame );
-		//stage.addActor( logo );
+		mainStage.addActor( screenBg );
+		mainStage.addActor( loadingBar );
+		mainStage.addActor( loadingBg );
+		mainStage.addActor( loadingBarHidden );
+		mainStage.addActor( loadingFrame );
+		//mainStage.addActor( logo );
 
 		// Uncomment to preload textures.
 		//context.getAssetManager().load( "img/buttons/FTL/pack.atlas", TextureAtlas.class );
@@ -97,7 +106,7 @@ public class LoadingScreen implements Screen {
 	public void resize( int width, int height ) {
 		width = 480 * width / height;
 		height = 480;
-		stage.setViewport( width, height, false );
+		mainStage.setViewport( width, height, false );
 
 		// Make the background fill the screen.
 		screenBg.setSize(width, height);
@@ -107,8 +116,8 @@ public class LoadingScreen implements Screen {
 		logo.setY((height - logo.getHeight()) / 2 + 100);
 
 		// Place the loading frame in the middle of the screen.
-		loadingFrame.setX((stage.getWidth() - loadingFrame.getWidth()) / 2);
-		loadingFrame.setY((stage.getHeight() - loadingFrame.getHeight()) / 2);
+		loadingFrame.setX((mainStage.getWidth() - loadingFrame.getWidth()) / 2);
+		loadingFrame.setY((mainStage.getHeight() - loadingFrame.getHeight()) / 2);
 
 		// Place the loading bar at the same spot as the frame, adjusted a few px.
 		loadingBar.setX(loadingFrame.getX() + 15);
@@ -129,7 +138,7 @@ public class LoadingScreen implements Screen {
 
 	@Override
 	public void show() {
-		Gdx.input.setInputProcessor( stage );
+		Gdx.input.setInputProcessor( mainStage );
 	}
 
 	@Override
@@ -161,9 +170,9 @@ public class LoadingScreen implements Screen {
 		loadingBg.invalidate();
 
 		if ( renderedPreviousFrame )
-			stage.act( delta );
+			mainStage.act( delta );
 
-		stage.draw();
+		mainStage.draw();
 
 		renderedPreviousFrame = true;
 	}
@@ -178,10 +187,27 @@ public class LoadingScreen implements Screen {
 	public void resume() {
 	}
 
+
 	@Override
 	public void dispose() {
-		stage.dispose();
+		mainStage.dispose();
 		loadingAssetManager.dispose();
 		Pools.get( OverdriveContext.class ).free( context );
+	}
+
+
+	@Override
+	public OVDStageManager getStageManager() {
+		return stageManager;
+	}
+
+	@Override
+	public OVDEventManager getEventManager() {
+		return eventManager;
+	}
+
+	@Override
+	public OVDScriptManager getScriptManager() {
+		return scriptManager;
 	}
 }

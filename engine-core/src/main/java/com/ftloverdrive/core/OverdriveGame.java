@@ -98,7 +98,7 @@ public class OverdriveGame implements ApplicationListener {
 		assetManager.setLoader( BitmapFont.class, new FreeTypeFontLoader( fileHandleResolver ) );
 
 		OverdriveContext context = new OverdriveContext();
-		context.init( this );
+		context.init( this, null, null );
 		screenManager = new OVDScreenManager( context );
 
 		screenManager.showScreen( screenManager.getInitScreenKey() );

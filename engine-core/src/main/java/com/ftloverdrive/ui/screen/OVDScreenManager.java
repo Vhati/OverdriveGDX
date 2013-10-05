@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.Pools;
 
 import com.ftloverdrive.core.OverdriveContext;
+import com.ftloverdrive.ui.screen.OVDScreen;
 import com.ftloverdrive.ui.screen.TestScreen;
 
 
@@ -24,7 +24,7 @@ public class OVDScreenManager implements Disposable {
 	public static final String CREDITS_SCREEN = "Credits";
 
 	private Logger log;
-	protected Map<String,Screen> screenMap = new HashMap<String,Screen>();
+	protected Map<String,OVDScreen> screenMap = new HashMap<String,OVDScreen>();
 	protected String currentScreenKey = null;
 
 	protected OverdriveContext context;
@@ -51,7 +51,7 @@ public class OVDScreenManager implements Disposable {
 	 */
 	public void showScreen( String key ) {
 		hideCurrentScreen();
-		Screen currentScreen = getOrCreateScreen( key );
+		OVDScreen currentScreen = getOrCreateScreen( key );
 		if ( currentScreen != null) {
 			currentScreenKey = key;
 			context.getGame().setScreen( currentScreen );
@@ -62,8 +62,8 @@ public class OVDScreenManager implements Disposable {
 	/**
 	 * Returns an existing or newly constructed screen, or null if not recognized.
 	 */
-	public Screen getOrCreateScreen( String key ) {
-		Screen screen = screenMap.get( key );
+	public OVDScreen getOrCreateScreen( String key ) {
+		OVDScreen screen = screenMap.get( key );
 		if ( screen == null ) {
 			if ( LOADING_SCREEN.equals( key ) ) {
 				screen = new LoadingScreen( context );
@@ -96,7 +96,7 @@ public class OVDScreenManager implements Disposable {
 		disposeCurrentScreen();
 
 		if ( nextScreenKey != null ) {
-			Screen nextScreen = getOrCreateScreen( nextScreenKey );
+			OVDScreen nextScreen = getOrCreateScreen( nextScreenKey );
 
 			currentScreenKey = nextScreenKey;
 			context.getGame().setScreen( nextScreen );
@@ -107,7 +107,7 @@ public class OVDScreenManager implements Disposable {
 	 * Hides the current screen. You'll still need to dispose() it.
 	 */
 	public void hideCurrentScreen() {
-		Screen currentScreen = screenMap.get( currentScreenKey );
+		OVDScreen currentScreen = screenMap.get( currentScreenKey );
 		if ( currentScreen != null) {
 			currentScreenKey = null;
 			context.getGame().setScreen( null );
@@ -115,7 +115,7 @@ public class OVDScreenManager implements Disposable {
 	}
 
 	public void disposeCurrentScreen() {
-		Screen currentScreen = screenMap.get( currentScreenKey );
+		OVDScreen currentScreen = screenMap.get( currentScreenKey );
 		if ( currentScreen != null) {
 			context.getGame().setScreen( null );
 			screenMap.remove( currentScreenKey );

@@ -1,7 +1,6 @@
 package com.ftloverdrive.ui.screen;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
@@ -21,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.Pools;
 
@@ -35,10 +35,11 @@ import com.ftloverdrive.model.ship.TestShipModel;
 import com.ftloverdrive.script.OVDScriptManager;
 import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.ui.hud.PlayerShipHullMonitor;
+import com.ftloverdrive.ui.screen.OVDScreen;
 import com.ftloverdrive.ui.screen.OVDStageManager;
 
 
-public class TestScreen implements Screen {
+public class TestScreen implements Disposable, OVDScreen {
 	protected static final String BKG_ATLAS = "img/stars/bg-dullstars-bigcols5.atlas";
 	protected static final String ROOT_ATLAS = "img/pack.atlas";
 	protected static final String MISC_ATLAS = "img/misc/pack.atlas";
@@ -55,13 +56,13 @@ public class TestScreen implements Screen {
 	private boolean renderedPreviousFrame = false;
 	private float elapsed = 0;
 
+	private OVDStageManager stageManager = null;
+	private OVDEventManager eventManager = null;
+	private OVDScriptManager scriptManager = null;
+
 	private InputMultiplexer inputMultiplexer;
 	private Stage mainStage;
 	private Stage hudStage;
-
-	private OVDStageManager stageManager;
-	private OVDEventManager eventManager;
-	private OVDScriptManager scriptManager;
 
 	private Sprite driftSprite;
 	private Animation walkAnim;
@@ -73,16 +74,13 @@ public class TestScreen implements Screen {
 	public TestScreen( OverdriveContext srcContext ) {
 		this.context = Pools.get( OverdriveContext.class ).obtain();
 		this.context.init( srcContext );
+		this.context.setScreen( this );
 
 		log = new Logger( TestScreen.class.getCanonicalName(), Logger.DEBUG );
 
 		stageManager = new OVDStageManager();
 		eventManager = new OVDEventManager();
 		scriptManager = new OVDScriptManager();
-
-		context.setScreenStageManager( stageManager );
-		context.setScreenEventManager( eventManager );
-		context.setScreenScriptManager( scriptManager );
 
 		mainStage = new Stage();
 		stageManager.putStage( "Main", mainStage );
@@ -144,9 +142,12 @@ public class TestScreen implements Screen {
 		batch = new SpriteBatch();
 
 		GameModel gameModel = new DefaultGameModel();
+		context.getReferenceManager().addObject( gameModel );
+
 		final ShipModel playerShipModel = new TestShipModel();
+		context.getReferenceManager().addObject( playerShipModel );
 		playerShipModel.getProperties().setInt( "HullMax", 40 );
-		gameModel.setPlayerShip( playerShipModel );
+		gameModel.setPlayerShip( context, playerShipModel );
 
 		playerShipHullMonitor = new PlayerShipHullMonitor( context );
 		playerShipHullMonitor.setPosition( 0, hudStage.getHeight()-playerShipHullMonitor.getHeight() );
@@ -253,6 +254,7 @@ public class TestScreen implements Screen {
 	public void resume() {
 	}
 
+
 	@Override
 	public void dispose() {
 		hudStage.dispose();
@@ -263,5 +265,21 @@ public class TestScreen implements Screen {
 		context.getAssetManager().unload( PEOPLE_ATLAS );
 		context.getAssetManager().unload( PLOT_FONT );
 		Pools.get( OverdriveContext.class ).free( context );
+	}
+
+
+	@Override
+	public OVDStageManager getStageManager() {
+		return stageManager;
+	}
+
+	@Override
+	public OVDEventManager getEventManager() {
+		return eventManager;
+	}
+
+	@Override
+	public OVDScriptManager getScriptManager() {
+		return scriptManager;
 	}
 }
