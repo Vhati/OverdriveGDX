@@ -97,7 +97,9 @@ public class OverdriveGame implements ApplicationListener {
 		assetManager = new AssetManager( fileHandleResolver );
 		assetManager.setLoader( BitmapFont.class, new FreeTypeFontLoader( fileHandleResolver ) );
 
-		screenManager = new OVDScreenManager( this );
+		OverdriveContext context = new OverdriveContext();
+		context.init( this );
+		screenManager = new OVDScreenManager( context );
 
 		screenManager.showScreen( screenManager.getInitScreenKey() );
 	}
@@ -195,6 +197,7 @@ public class OverdriveGame implements ApplicationListener {
 	@Override
 	public void dispose () {
 		if ( currentScreen != null ) currentScreen.dispose();
+		screenManager.dispose();
 		assetManager.dispose();
 	}
 }

@@ -22,7 +22,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Logger;
+import com.badlogic.gdx.utils.Pools;
 
+import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEventManager;
 import com.ftloverdrive.event.TickEvent;
 import com.ftloverdrive.event.TickListener;
@@ -34,8 +36,6 @@ import com.ftloverdrive.script.OVDScriptManager;
 import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.ui.hud.PlayerShipHullMonitor;
 import com.ftloverdrive.ui.screen.OVDStageManager;
-
-import com.ftloverdrive.core.OverdriveGame;
 
 
 public class TestScreen implements Screen {
@@ -67,42 +67,48 @@ public class TestScreen implements Screen {
 	private Animation walkAnim;
 	private PlayerShipHullMonitor playerShipHullMonitor;
 
-	private OverdriveGame game;
+	private OverdriveContext context;
 
 
-	public TestScreen( OverdriveGame game ) {
-		this.game = game;
+	public TestScreen( OverdriveContext srcContext ) {
+		this.context = Pools.get( OverdriveContext.class ).obtain();
+		this.context.init( srcContext );
+
 		log = new Logger( TestScreen.class.getCanonicalName(), Logger.DEBUG );
 
 		stageManager = new OVDStageManager();
 		eventManager = new OVDEventManager();
 		scriptManager = new OVDScriptManager();
 
+		context.setScreenStageManager( stageManager );
+		context.setScreenEventManager( eventManager );
+		context.setScreenScriptManager( scriptManager );
+
 		mainStage = new Stage();
 		stageManager.putStage( "Main", mainStage );
 		hudStage = new Stage();
 		stageManager.putStage( "HUD", hudStage );
 
-		game.getAssetManager().load( BKG_ATLAS, TextureAtlas.class );
-		game.getAssetManager().load( ROOT_ATLAS, TextureAtlas.class );
-		game.getAssetManager().load( MISC_ATLAS, TextureAtlas.class );
-		game.getAssetManager().load( PEOPLE_ATLAS, TextureAtlas.class );
-		game.getAssetManager().load( PLOT_FONT, BitmapFont.class );
-		game.getAssetManager().finishLoading();
+		context.getAssetManager().load( BKG_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( ROOT_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( MISC_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( PEOPLE_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( PLOT_FONT, BitmapFont.class );
+		context.getAssetManager().finishLoading();
 
-		bgAtlas = game.getAssetManager().get( BKG_ATLAS, TextureAtlas.class );
+		bgAtlas = context.getAssetManager().get( BKG_ATLAS, TextureAtlas.class );
 		ShatteredImage bgImage = new ShatteredImage( bgAtlas.findRegions( "bg-dullstars" ), 5 );
 		bgImage.setFillParent( true );
 		bgImage.setPosition( 0, 0 );
 		mainStage.addActor( bgImage );
 
-		BitmapFont plotFont = game.getAssetManager().get( PLOT_FONT, BitmapFont.class );
+		BitmapFont plotFont = context.getAssetManager().get( PLOT_FONT, BitmapFont.class );
 
 		String loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, ";
 		loremIpsum += "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
 		loremIpsum += "\n\nThis window is draggable.";
 
-		rootAtlas = game.getAssetManager().get( ROOT_ATLAS, TextureAtlas.class );
+		rootAtlas = context.getAssetManager().get( ROOT_ATLAS, TextureAtlas.class );
 		TextureRegion plotDlgRegion = rootAtlas.findRegion( "box-text1" );
 		NinePatchDrawable plotDlgBgDrawable = new NinePatchDrawable( new NinePatch( plotDlgRegion, 20, 20, 35, 20 ) );
 
@@ -120,10 +126,10 @@ public class TestScreen implements Screen {
 
 		hudStage.addActor( plotDlg );
 
-		miscAtlas = game.getAssetManager().get( MISC_ATLAS, TextureAtlas.class );
+		miscAtlas = context.getAssetManager().get( MISC_ATLAS, TextureAtlas.class );
 		driftSprite = miscAtlas.createSprite( "crosshairs-placed" );
 
-		peopleAtlas = game.getAssetManager().get( PEOPLE_ATLAS, TextureAtlas.class );
+		peopleAtlas = context.getAssetManager().get( PEOPLE_ATLAS, TextureAtlas.class );
 		TextureRegion crewRegion = peopleAtlas.findRegion( "human-player-yellow" );
 
 		// FTL's animations.xml counts 0-based rows from the bottom.
@@ -139,10 +145,11 @@ public class TestScreen implements Screen {
 
 		GameModel gameModel = new DefaultGameModel();
 		final ShipModel playerShipModel = new TestShipModel();
+		context.getReferenceManager().addObject( playerShipModel );
 		playerShipModel.getProperties().setInt( "HullMax", 40 );
 		gameModel.setPlayerShip( playerShipModel );
 
-		playerShipHullMonitor = new PlayerShipHullMonitor();
+		playerShipHullMonitor = new PlayerShipHullMonitor( context );
 		playerShipHullMonitor.setPosition( 0, hudStage.getHeight()-playerShipHullMonitor.getHeight() );
 		playerShipHullMonitor.setModel( playerShipModel );
 		hudStage.addActor( playerShipHullMonitor );
@@ -152,7 +159,7 @@ public class TestScreen implements Screen {
 		inputMultiplexer.addProcessor( mainStage );
 
 		try {
-			FileHandleResolver resolver = game.getFileHandleResolver();
+			FileHandleResolver resolver = context.getFileHandleResolver();
 			//scriptManager.eval( resolver.resolve( "script.java" ) );
 		}
 		catch ( Exception e ) {
@@ -251,10 +258,11 @@ public class TestScreen implements Screen {
 	public void dispose() {
 		hudStage.dispose();
 		playerShipHullMonitor.dispose();
-		game.getAssetManager().unload( BKG_ATLAS );
-		game.getAssetManager().unload( ROOT_ATLAS );
-		game.getAssetManager().unload( MISC_ATLAS );
-		game.getAssetManager().unload( PEOPLE_ATLAS );
-		game.getAssetManager().unload( PLOT_FONT );
+		context.getAssetManager().unload( BKG_ATLAS );
+		context.getAssetManager().unload( ROOT_ATLAS );
+		context.getAssetManager().unload( MISC_ATLAS );
+		context.getAssetManager().unload( PEOPLE_ATLAS );
+		context.getAssetManager().unload( PLOT_FONT );
+		Pools.get( OverdriveContext.class ).free( context );
 	}
 }

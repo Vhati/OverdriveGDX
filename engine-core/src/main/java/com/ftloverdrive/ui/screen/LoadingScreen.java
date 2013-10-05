@@ -21,8 +21,9 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Logger;
+import com.badlogic.gdx.utils.Pools;
 
-import com.ftloverdrive.core.OverdriveGame;
+import com.ftloverdrive.core.OverdriveContext;
 
 
 public class LoadingScreen implements Screen {
@@ -43,11 +44,13 @@ public class LoadingScreen implements Screen {
 	private float progress, percent;
 	private boolean renderedPreviousFrame = false;
 
-	private OverdriveGame game;
+	private OverdriveContext context;
 
 
-	public LoadingScreen( OverdriveGame game ) {
-		this.game = game;
+	public LoadingScreen( OverdriveContext srcContext ) {
+		this.context = Pools.get( OverdriveContext.class ).obtain();
+		this.context.init( srcContext );
+
 		log = new Logger( LoadingScreen.class.getCanonicalName(), Logger.INFO );
 
 		loadingAssetManager = new AssetManager();
@@ -78,15 +81,15 @@ public class LoadingScreen implements Screen {
 		//stage.addActor( logo );
 
 		// Uncomment to preload textures.
-		//game.getAssetManager().load( "img/buttons/FTL/pack.atlas", TextureAtlas.class );
-		//game.getAssetManager().load( "img/combatUI/pack.atlas", TextureAtlas.class );
-		game.getAssetManager().load( "img/effects/pack.atlas", TextureAtlas.class );
-		game.getAssetManager().load( "img/icons/pack.atlas", TextureAtlas.class );
-		game.getAssetManager().load( "img/people/pack.atlas", TextureAtlas.class );
-		//game.getAssetManager().load( "img/ship/pack.atlas", TextureAtlas.class );
-		game.getAssetManager().load( "img/statusUI/pack.atlas", TextureAtlas.class );
-		game.getAssetManager().load( "img/systemUI/pack.atlas", TextureAtlas.class );
-		//game.getAssetManager().load( "img/weapons/pack.atlas", TextureAtlas.class );
+		//context.getAssetManager().load( "img/buttons/FTL/pack.atlas", TextureAtlas.class );
+		//context.getAssetManager().load( "img/combatUI/pack.atlas", TextureAtlas.class );
+		context.getAssetManager().load( "img/effects/pack.atlas", TextureAtlas.class );
+		context.getAssetManager().load( "img/icons/pack.atlas", TextureAtlas.class );
+		context.getAssetManager().load( "img/people/pack.atlas", TextureAtlas.class );
+		//context.getAssetManager().load( "img/ship/pack.atlas", TextureAtlas.class );
+		context.getAssetManager().load( "img/statusUI/pack.atlas", TextureAtlas.class );
+		context.getAssetManager().load( "img/systemUI/pack.atlas", TextureAtlas.class );
+		//context.getAssetManager().load( "img/weapons/pack.atlas", TextureAtlas.class );
 	}
 
 
@@ -142,14 +145,14 @@ public class LoadingScreen implements Screen {
 		Gdx.gl.glClear( GL10.GL_COLOR_BUFFER_BIT );
 
 		// Incrementally load assets until completely done.
-		if ( game.getAssetManager().update() ) {
+		if ( context.getAssetManager().update() ) {
 			//if ( Gdx.input.isTouched() ) {
-				game.getScreenManager().continueToNextScreen();
+				context.getScreenManager().continueToNextScreen();
 			//}
 		}
 
 		// Interpolate the percentage to make it more smooth.
-		progress = game.getAssetManager().getProgress();
+		progress = context.getAssetManager().getProgress();
 		percent = Interpolation.linear.apply( percent, progress, 0.1f );
 
 		loadingBarHidden.setX( startX + endX * percent );
@@ -179,5 +182,6 @@ public class LoadingScreen implements Screen {
 	public void dispose() {
 		stage.dispose();
 		loadingAssetManager.dispose();
+		Pools.get( OverdriveContext.class ).free( context );
 	}
 }

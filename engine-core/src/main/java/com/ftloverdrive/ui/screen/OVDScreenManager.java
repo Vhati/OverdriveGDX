@@ -6,13 +6,15 @@ import java.util.List;
 import java.util.Map;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Logger;
+import com.badlogic.gdx.utils.Pools;
 
-import com.ftloverdrive.core.OverdriveGame;
+import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.ui.screen.TestScreen;
 
 
-public class OVDScreenManager {
+public class OVDScreenManager implements Disposable {
 	public static final String TEST_SCREEN = "Test";
 
 	public static final String LOADING_SCREEN = "Loading";
@@ -25,12 +27,14 @@ public class OVDScreenManager {
 	protected Map<String,Screen> screenMap = new HashMap<String,Screen>();
 	protected String currentScreenKey = null;
 
-	protected OverdriveGame game;
+	protected OverdriveContext context;
 
 
-	public OVDScreenManager( OverdriveGame game ) {
+	public OVDScreenManager( OverdriveContext srcContext ) {
+		this.context = Pools.get( OverdriveContext.class ).obtain();
+		this.context.init( srcContext );
+
 		log = new Logger( OVDScreenManager.class.getCanonicalName(), Logger.INFO );
-		this.game = game;
 	}
 
 	/**
@@ -50,7 +54,7 @@ public class OVDScreenManager {
 		Screen currentScreen = getOrCreateScreen( key );
 		if ( currentScreen != null) {
 			currentScreenKey = key;
-			game.setScreen( currentScreen );
+			context.getGame().setScreen( currentScreen );
 		}
 	}
 
@@ -62,10 +66,10 @@ public class OVDScreenManager {
 		Screen screen = screenMap.get( key );
 		if ( screen == null ) {
 			if ( LOADING_SCREEN.equals( key ) ) {
-				screen = new LoadingScreen( game );
+				screen = new LoadingScreen( context );
 			}
 			else if ( TEST_SCREEN.equals( key ) ) {
-				screen = new TestScreen( game );
+				screen = new TestScreen( context );
 			}
 			if ( screen != null ) {
 				screenMap.put( key, screen );
@@ -95,7 +99,7 @@ public class OVDScreenManager {
 			Screen nextScreen = getOrCreateScreen( nextScreenKey );
 
 			currentScreenKey = nextScreenKey;
-			game.setScreen( nextScreen );
+			context.getGame().setScreen( nextScreen );
 		}
 	}
 
@@ -106,17 +110,22 @@ public class OVDScreenManager {
 		Screen currentScreen = screenMap.get( currentScreenKey );
 		if ( currentScreen != null) {
 			currentScreenKey = null;
-			game.setScreen( null );
+			context.getGame().setScreen( null );
 		}
 	}
 
 	public void disposeCurrentScreen() {
 		Screen currentScreen = screenMap.get( currentScreenKey );
 		if ( currentScreen != null) {
-			game.setScreen( null );
+			context.getGame().setScreen( null );
 			screenMap.remove( currentScreenKey );
 			currentScreen.dispose();
 			currentScreenKey = null;
 		}
+	}
+
+	@Override
+	public void dispose() {
+		Pools.get( OverdriveContext.class ).free( context );
 	}
 }

@@ -1,41 +1,36 @@
 package com.ftloverdrive.ui.hud;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL10;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
-import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Disposable;
 
-import com.ftloverdrive.core.OverdriveGame;
+import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.model.NamedProperties;
 import com.ftloverdrive.model.PropertiesObserver;
 import com.ftloverdrive.model.ship.ShipModel;
 
 
-public class PlayerShipHullMonitor extends Actor implements PropertiesObserver {
+public class PlayerShipHullMonitor extends Actor implements Disposable, PropertiesObserver {
 	protected static final String STATUSUI_ATLAS = "img/statusUI/pack.atlas";
 
-	protected OverdriveGame game;
+	protected AssetManager assetManager;
 	protected Sprite bgSprite;
 	protected Sprite barSprite;
 	protected float barClipWidth = 0;
 	protected NamedProperties shipProperties = null;
 
 
-	public PlayerShipHullMonitor() {
+	public PlayerShipHullMonitor( OverdriveContext context ) {
 		super();
-		game = (OverdriveGame)Gdx.app.getApplicationListener();
+		assetManager = context.getAssetManager();
 
-		game.getAssetManager().load( STATUSUI_ATLAS, TextureAtlas.class );
-		game.getAssetManager().finishLoading();
-		TextureAtlas statusUIAtlas = game.getAssetManager().get( STATUSUI_ATLAS, TextureAtlas.class );
+		assetManager.load( STATUSUI_ATLAS, TextureAtlas.class );
+		assetManager.finishLoading();
+		TextureAtlas statusUIAtlas = assetManager.get( STATUSUI_ATLAS, TextureAtlas.class );
 
 		bgSprite = statusUIAtlas.createSprite( "top-hull" );
 		this.setWidth( bgSprite.getWidth() );
@@ -96,6 +91,6 @@ public class PlayerShipHullMonitor extends Actor implements PropertiesObserver {
 
 	// Actors don't normally have a dispose().
 	public void dispose() {
-		game.getAssetManager().unload( STATUSUI_ATLAS );
+		assetManager.unload( STATUSUI_ATLAS );
 	}
 }
