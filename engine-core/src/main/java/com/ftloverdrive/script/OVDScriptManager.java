@@ -28,12 +28,14 @@ public class OVDScriptManager {
 		log = new Logger( OVDScriptManager.class.getCanonicalName(), Logger.INFO );
 
 		bsh = new Interpreter();
+/*
 		try {
 			bsh.eval( "print( \"Hello World\" );" );
 		}
 		catch( EvalError e ) {
 			log.error( "Error evaluating script.", e );
 		}
+*/
 	}
 
 
