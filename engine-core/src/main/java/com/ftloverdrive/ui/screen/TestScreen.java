@@ -145,7 +145,6 @@ public class TestScreen implements Screen {
 
 		GameModel gameModel = new DefaultGameModel();
 		final ShipModel playerShipModel = new TestShipModel();
-		context.getReferenceManager().addObject( playerShipModel );
 		playerShipModel.getProperties().setInt( "HullMax", 40 );
 		gameModel.setPlayerShip( playerShipModel );
 
