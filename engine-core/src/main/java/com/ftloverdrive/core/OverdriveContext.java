@@ -23,10 +23,14 @@ import com.ftloverdrive.ui.screen.OVDStageManager;
  * It might make sense for an object of limited scope to take context as an
  * arg in its constructor and remember it. But if possible, individual
  * methods should never cache an old context passed to them.
- *
+ * 
  * Context objects can be created by a Pool for reuse, but it will not be
  * safe to free() them until they're definitely forgotten.
  *
+ * OverdriveContext context = Pools.get( OverdriveContext.class ).obtain();
+ * context.init(...);
+ *
+ * @see com.badlogic.gdx.utils.Pools
  * @see com.badlogic.gdx.utils.Pool
  * @see com.badlogic.gdx.utils.Pool.Poolable
  */
