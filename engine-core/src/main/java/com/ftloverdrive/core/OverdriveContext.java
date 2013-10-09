@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 
 import com.ftloverdrive.core.OverdriveGame;
 import com.ftloverdrive.event.OVDEventManager;
-import com.ftloverdrive.model.GameModel;
+import com.ftloverdrive.net.OVDNetManager;
 import com.ftloverdrive.script.OVDScriptManager;
 import com.ftloverdrive.ui.screen.OVDScreen;
 import com.ftloverdrive.ui.screen.OVDScreenManager;
@@ -38,7 +38,7 @@ public class OverdriveContext implements Poolable {
 
 	protected OverdriveGame game = null;
 	protected OVDScreen screen = null;
-	protected GameModel gameModel = null;
+	protected int gameModelRefId = -1;
 
 
 	/**
@@ -63,10 +63,10 @@ public class OverdriveContext implements Poolable {
 	/**
 	 * Pseudo constructor.
 	 */
-	public void init( OverdriveGame game, OVDScreen screen, GameModel gameModel ) {
+	public void init( OverdriveGame game, OVDScreen screen, int gameModelRefId ) {
 		this.game = game;
 		this.screen = screen;
-		this.gameModel = gameModel;
+		this.gameModelRefId = gameModelRefId;
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class OverdriveContext implements Poolable {
 	public void init( OverdriveContext context ) {
 		this.game = context.getGame();
 		this.screen = context.getScreen();
-		this.gameModel = context.getGameModel();
+		this.gameModelRefId = context.getGameModelRefId();
 	}
 
 
@@ -110,6 +110,11 @@ public class OverdriveContext implements Poolable {
 		else return null;
 	}
 
+	public OVDNetManager getNetManager() {
+		if ( game != null ) return game.getNetManager();
+		else return null;
+	}
+
 
 	public void setScreen( OVDScreen screen ) {
 		this.screen = screen;
@@ -136,12 +141,12 @@ public class OverdriveContext implements Poolable {
 	}
 
 
-	public void setGameModel( GameModel gameModel ) {
-		this.gameModel = gameModel;
+	public void setGameModelRefId( int refId ) {
+		this.gameModelRefId = refId;
 	}
 
-	public GameModel getGameModel() {
-		return gameModel;
+	public int getGameModelRefId() {
+		return gameModelRefId;
 	}
 
 
@@ -156,6 +161,6 @@ public class OverdriveContext implements Poolable {
 	public void reset() {
 		this.game = null;
 		this.screen = null;
-		this.gameModel = null;
+		this.gameModelRefId = -1;
 	}
 }

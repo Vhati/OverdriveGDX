@@ -1,5 +1,6 @@
 package com.ftloverdrive.model;
 
+import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.model.GameModelObserver;
 import com.ftloverdrive.model.NamedProperties;
 import com.ftloverdrive.model.OVDModel;
@@ -11,9 +12,9 @@ public interface GameModel extends OVDModel {
 	public NamedProperties getProperties();
 
 
-	public void setPlayerShip( ShipModel model );
+	public void setPlayerShip( int shipModelRefId );
 
-	public ShipModel getPlayerShip();
+	public int getPlayerShip();
 
 
 	public void addGameModelObserver( GameModelObserver o );

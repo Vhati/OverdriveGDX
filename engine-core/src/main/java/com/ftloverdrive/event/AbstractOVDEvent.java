@@ -4,16 +4,16 @@ import com.ftloverdrive.event.OVDEvent;
 
 
 public abstract class AbstractOVDEvent implements OVDEvent {
-	protected Object source = null;
+	protected int sourceRefId = -1;
 	protected boolean cancelled = false;
 
 
-	public void setSource( Object source ) {
-		this.source = source;
+	public void setSource( int srcRefId ) {
+		this.sourceRefId = srcRefId;
 	}
 
-	public Object getSource() {
-		return source;
+	public int getSource() {
+		return sourceRefId;
 	}
 
 	public void cancel() {

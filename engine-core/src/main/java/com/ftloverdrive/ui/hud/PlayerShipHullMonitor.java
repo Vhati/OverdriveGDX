@@ -9,19 +9,21 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Disposable;
 
 import com.ftloverdrive.core.OverdriveContext;
-import com.ftloverdrive.model.NamedProperties;
-import com.ftloverdrive.model.PropertiesObserver;
+import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
+import com.ftloverdrive.event.game.GamePlayerShipChangeListener;
+import com.ftloverdrive.event.ship.ShipPropertyEvent;
+import com.ftloverdrive.event.ship.ShipPropertyListener;
 import com.ftloverdrive.model.ship.ShipModel;
 
 
-public class PlayerShipHullMonitor extends Actor implements Disposable, PropertiesObserver {
+public class PlayerShipHullMonitor extends Actor implements Disposable, GamePlayerShipChangeListener, ShipPropertyListener {
 	protected static final String STATUSUI_ATLAS = "img/statusUI/pack.atlas";
 
 	protected AssetManager assetManager;
 	protected Sprite bgSprite;
 	protected Sprite barSprite;
 	protected float barClipWidth = 0;
-	protected NamedProperties shipProperties = null;
+	protected int shipModelRefId = -1;
 
 
 	public PlayerShipHullMonitor( OverdriveContext context ) {
@@ -59,27 +61,40 @@ public class PlayerShipHullMonitor extends Actor implements Disposable, Properti
 	}
 
 
-	public void setModel( ShipModel shipModel ) {
-		if ( shipProperties != null ) shipProperties.removePropertiesObserver( this );
-
-		if ( shipModel == null ) {
-			barClipWidth = 0;
-			shipProperties = null;
-		} else {
-			shipProperties = shipModel.getProperties();
-			shipProperties.addPropertiesObserver( this );
-			propertyChanged( shipProperties, NamedProperties.INT_TYPE, "Hull" );
-		}
+	public void setShipModel( OverdriveContext context, int shipModelRefId ) {
+		this.shipModelRefId = shipModelRefId;
+		updateShipInfo( context );
 	}
 
 
 	@Override
-	public void propertyChanged( NamedProperties source, int type, String key ) {
-		if ( source != shipProperties ) return;
+	public void gamePlayerShipChanged( OverdriveContext context, GamePlayerShipChangeEvent e ) {
+		setShipModel( context, e.getShipRefId() );
+	}
 
-		if ( type == NamedProperties.INT_TYPE && ( "Hull".equals( key ) || "HullMax".equals( key ) ) ) {
-			int hullAmt = source.getInt( "Hull" );
-			int hullMax = source.getInt( "HullMax" );
+	@Override
+	public void shipPropertyChanged( OverdriveContext context, ShipPropertyEvent e ) {
+		if ( e.getShipRefId() != shipModelRefId ) return;
+
+		if ( e.getPropertyType() == ShipPropertyEvent.INT_TYPE ) {
+			if ( "Hull".equals( e.getPropertyKey() ) || "HullMax".equals( e.getPropertyKey() ) ) {
+				updateShipInfo( context );
+			}
+		}
+	}
+
+
+	/**
+	 * Updates the bar to match the player ship's Hull/HullMax.
+	 */
+	private void updateShipInfo( OverdriveContext context ) {
+		if ( shipModelRefId == -1 ) {
+			barClipWidth = 0;
+		}
+		else {
+			ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
+			int hullAmt = shipModel.getProperties().getInt( "Hull" );
+			int hullMax = shipModel.getProperties().getInt( "HullMax" );
 			if ( hullMax != 0 ) {
 				barClipWidth = Math.min( ((float)hullAmt / hullMax) * barSprite.getWidth(), barSprite.getWidth() );
 			} else {
@@ -90,6 +105,7 @@ public class PlayerShipHullMonitor extends Actor implements Disposable, Properti
 
 
 	// Actors don't normally have a dispose().
+	@Override
 	public void dispose() {
 		assetManager.unload( STATUSUI_ATLAS );
 	}

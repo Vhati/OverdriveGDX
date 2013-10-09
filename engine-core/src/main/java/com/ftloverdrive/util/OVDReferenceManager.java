@@ -9,7 +9,6 @@ import com.badlogic.gdx.utils.ObjectIntMap;
  */
 public class OVDReferenceManager {
 
-	int nextId = 0;
 	private IntMap<Object> idToObjMap = new IntMap<Object>();
 	private ObjectIntMap<Object> objToIdMap = new ObjectIntMap<Object>();
 
@@ -19,23 +18,16 @@ public class OVDReferenceManager {
 
 
 	/**
-	 * This method generally should not be called.
+	 * Adds an object to be managed with the given id.
+	 *
+	 * @return  the assigned id
 	 */
-	public void setNextId( int n ) {
-		nextId = n;
-	}
+	public int addObject( Object o, int id ) {
+		forget( o );
+		forget( id );
+		objToIdMap.put( o, id );
+		idToObjMap.put( id, o );
 
-
-	/**
-	 * Adds an object to be managed and returns its assigned id.
-	 */
-	public int addObject( Object o ) {
-		int id = getId( o );
-		if ( id == -1 ) {
-			id = nextId++;
-			objToIdMap.put( o, id );
-			idToObjMap.put( id, o );
-		}
 		return id;
 	}
 

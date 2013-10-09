@@ -2,10 +2,13 @@ package com.ftloverdrive.event;
 
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.Deque;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pools;
 
+import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEvent;
 import com.ftloverdrive.event.OVDEventListenerList;
 import com.ftloverdrive.event.TickEvent;
@@ -24,6 +27,7 @@ public class OVDEventManager {
 	private Deque<OVDEvent> inQueue = new LinkedBlockingDeque<OVDEvent>();
 	OVDEventListenerList outListenerList = new OVDEventListenerList();
 	OVDEventListenerList inListenerList = new OVDEventListenerList();
+	Map<Class,OVDEventHandler> handlerMap = new HashMap<Class,OVDEventHandler>();
 
 	private final int tickRate = 1000;  // Milliseconds per tick of game-time.
 	private int spareTime = 0;          // Remembers leftover milliseconds between ticks.
@@ -40,11 +44,15 @@ public class OVDEventManager {
 	/**
 	 * Dispatches any pending events and returns.
 	 */
-	public void processEvents() {
+	public void processEvents( OverdriveContext context ) {
 		OVDEvent event;
 		while ( (event = inQueue.poll()) != null ) {
-			if ( event instanceof TickEvent ) {
-				processTickEvent( (TickEvent)event );
+			OVDEventHandler h = handlerMap.get( event.getClass() );
+			if ( h != null ) {
+				h.handle( context, event, inListenerList.getListenerList() );
+			}
+			else {
+				//System.out.println( "Unhandled event: "+ event );
 			}
 		}
 		while ( (event = outQueue.poll()) != null ) {
@@ -101,21 +109,21 @@ public class OVDEventManager {
 		}
 	}
 
-	public void addTickListener( TickListener l ) {
-		inListenerList.add( TickListener.class, l );
+
+	/**
+	 * Sets the handler for a specific event class.
+	 */
+	public void setEventHandler( Class eventClass, OVDEventHandler h ) {
+		handlerMap.put( eventClass, h );
 	}
 
-	public void removeTickListener( TickListener l ) {
-		inListenerList.remove( TickListener.class, l );
-	}
-
-	protected void processTickEvent( TickEvent event ) {
-		Object[] listeners = inListenerList.getListenerList();
-		for ( int i = listeners.length-2; i >= 0; i-=2 ) {
-			if ( listeners[i] == TickListener.class ) {
-				((TickListener)listeners[i+1]).ticksAccumulated( event );
-			}
-		}
-		tickEventPool.free( event );
+	/**
+	 * Adds a listener for incoming events.
+	 *
+	 * @param l  a listener to be notified
+	 * @param listenerClass  a class a handler expects that the listener can be cast as
+	 */
+	public <T extends OVDEventListener> void addEventListener( T l, Class<T> listenerClass ) {
+		inListenerList.add( listenerClass, l );
 	}
 }

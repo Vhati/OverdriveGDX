@@ -3,9 +3,9 @@ package com.ftloverdrive.event;
 
 public interface OVDEvent {
 
-	public void setSource( Object source );
+	public void setSource( int srcRefId );
 
-	public Object getSource();
+	public int getSource();
 
 	public void cancel();
 

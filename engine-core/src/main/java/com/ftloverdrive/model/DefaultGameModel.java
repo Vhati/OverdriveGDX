@@ -2,6 +2,7 @@ package com.ftloverdrive.model;
 
 import com.badlogic.gdx.utils.Array;
 
+import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.model.AbstractOVDModel;
 import com.ftloverdrive.model.NamedProperties;
 import com.ftloverdrive.model.ship.ShipModel;
@@ -16,7 +17,7 @@ public class DefaultGameModel extends AbstractOVDModel implements GameModel {
 	protected Array<GameModelObserver> gameModelObservers = null;
 
 	protected NamedProperties gameProperties = new NamedProperties();
-	protected ShipModel playerShipModel = null;
+	protected int playerShipModelRefId = -1;
 
 
 	public DefaultGameModel() {
@@ -34,14 +35,14 @@ public class DefaultGameModel extends AbstractOVDModel implements GameModel {
 
 
 	@Override
-	public void setPlayerShip( ShipModel model ) {
-		playerShipModel = model;
+	public void setPlayerShip( int shipModelRefId ) {
+		playerShipModelRefId = shipModelRefId;
 		fireGamePlayerShipReplaced();
 	}
 
 	@Override
-	public ShipModel getPlayerShip() {
-		return playerShipModel;
+	public int getPlayerShip() {
+		return playerShipModelRefId;
 	}
 
 

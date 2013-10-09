@@ -28,6 +28,14 @@ import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEventManager;
 import com.ftloverdrive.event.TickEvent;
 import com.ftloverdrive.event.TickListener;
+import com.ftloverdrive.event.game.GamePlayerShipChangeEvent;
+import com.ftloverdrive.event.game.GamePlayerShipChangeListener;
+import com.ftloverdrive.event.handler.GameEventHandler;
+import com.ftloverdrive.event.handler.ShipEventHandler;
+import com.ftloverdrive.event.handler.TickEventHandler;
+import com.ftloverdrive.event.ship.ShipCreationEvent;
+import com.ftloverdrive.event.ship.ShipPropertyEvent;
+import com.ftloverdrive.event.ship.ShipPropertyListener;
 import com.ftloverdrive.model.DefaultGameModel;
 import com.ftloverdrive.model.GameModel;
 import com.ftloverdrive.model.ship.ShipModel;
@@ -64,8 +72,8 @@ public class TestScreen implements Disposable, OVDScreen {
 	private Stage mainStage;
 	private Stage hudStage;
 
-	private Sprite driftSprite;
-	private Animation walkAnim;
+	private Sprite driftSprite = null;
+	private Animation walkAnim = null;
 	private PlayerShipHullMonitor playerShipHullMonitor;
 
 	private OverdriveContext context;
@@ -100,6 +108,94 @@ public class TestScreen implements Disposable, OVDScreen {
 		bgImage.setPosition( 0, 0 );
 		mainStage.addActor( bgImage );
 
+		textWindowDemo();
+
+		movingSpriteDemo();
+
+		walkAnimDemo();
+
+		batch = new SpriteBatch();
+
+		GameModel gameModel = new DefaultGameModel();
+		int gameRefId = context.getNetManager().requestNewRefId();
+		context.getReferenceManager().addObject( gameModel, 0 );
+		context.setGameModelRefId( gameRefId );
+
+		playerShipHullMonitor = new PlayerShipHullMonitor( context );
+		playerShipHullMonitor.setPosition( 0, hudStage.getHeight()-playerShipHullMonitor.getHeight() );
+		hudStage.addActor( playerShipHullMonitor );
+
+		inputMultiplexer = new InputMultiplexer();
+		inputMultiplexer.addProcessor( hudStage );
+		inputMultiplexer.addProcessor( mainStage );
+
+
+		// Wire up the event manager...
+		TickEventHandler tickHandler = new TickEventHandler();
+		for ( Class c : tickHandler.getEventClasses() )
+			eventManager.setEventHandler( c, tickHandler );
+
+		GameEventHandler gameHandler = new GameEventHandler();
+		for ( Class c : gameHandler.getEventClasses() )
+			eventManager.setEventHandler( c, gameHandler );
+
+		ShipEventHandler shipHandler = new ShipEventHandler();
+		for ( Class c : shipHandler.getEventClasses() )
+			eventManager.setEventHandler( c, shipHandler );
+
+		eventManager.addEventListener( playerShipHullMonitor, GamePlayerShipChangeListener.class );
+		eventManager.addEventListener( playerShipHullMonitor, ShipPropertyListener.class );
+
+		// When there's a ship, increment its hull after every tick.
+		eventManager.addEventListener(new TickListener() {
+			@Override
+			public void ticksAccumulated( TickEvent e ) {
+				//System.out.println( "Tick ("+ e.getTickCount() +")" );
+
+				GameModel gameModel = context.getReferenceManager().getObject( context.getGameModelRefId(), GameModel.class );
+				int shipRefId = gameModel.getPlayerShip();
+				if ( shipRefId != -1 ) {
+					ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
+					int hull = shipModel.getProperties().getInt( "Hull" );
+					int hullMax = shipModel.getProperties().getInt( "HullMax" );
+					if ( hull < hullMax ) {
+						ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
+						event.init( shipRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, "Hull", 1 );
+						context.getScreenEventManager().postDelayedEvent( event );
+					}
+				}
+
+				// Eventually a PropertyEvent would have an INC_IF_LESS_THAN flag
+				// or something. Or maybe a sentinel event listener - set to watch
+				// certain property names - vetoing attempts to increment beyond
+				// the names' associated maxes?
+			}
+		}, TickListener.class);
+
+
+		// Create a test ship.
+		int shipRefId = context.getNetManager().requestNewRefId();
+		ShipCreationEvent shipCreateEvent = Pools.get( ShipCreationEvent.class ).obtain();
+		shipCreateEvent.init( shipRefId, "Test" );
+		eventManager.postDelayedEvent( shipCreateEvent );
+
+		// Set it as the player's ship.
+		GamePlayerShipChangeEvent shipChangeEvent = Pools.get( GamePlayerShipChangeEvent.class ).obtain();
+		shipChangeEvent.init( gameRefId, shipRefId );
+		eventManager.postDelayedEvent( shipChangeEvent );
+
+
+		try {
+			FileHandleResolver resolver = context.getFileHandleResolver();
+			//scriptManager.eval( resolver.resolve( "script.java" ) );
+		}
+		catch ( Exception e ) {
+			log.error( "Error evaluating script.", e );
+		}
+	}
+
+
+	private void textWindowDemo() {
 		BitmapFont plotFont = context.getAssetManager().get( PLOT_FONT, BitmapFont.class );
 
 		String loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, ";
@@ -123,10 +219,14 @@ public class TestScreen implements Disposable, OVDScreen {
 		plotDlg.add( plotLbl );
 
 		hudStage.addActor( plotDlg );
+	}
 
+	private void movingSpriteDemo() {
 		miscAtlas = context.getAssetManager().get( MISC_ATLAS, TextureAtlas.class );
 		driftSprite = miscAtlas.createSprite( "crosshairs-placed" );
+	}
 
+	private void walkAnimDemo() {
 		peopleAtlas = context.getAssetManager().get( PEOPLE_ATLAS, TextureAtlas.class );
 		TextureRegion crewRegion = peopleAtlas.findRegion( "human-player-yellow" );
 
@@ -138,51 +238,6 @@ public class TestScreen implements Disposable, OVDScreen {
 			walkFrames[i] = tmpFrames[0][ walkStart + i ];
 		}
 		walkAnim = new Animation( .3f, walkFrames );
-
-		batch = new SpriteBatch();
-
-		GameModel gameModel = new DefaultGameModel();
-		context.getReferenceManager().addObject( gameModel );
-
-		final ShipModel playerShipModel = new TestShipModel();
-		context.getReferenceManager().addObject( playerShipModel );
-		playerShipModel.getProperties().setInt( "HullMax", 40 );
-		gameModel.setPlayerShip( context, playerShipModel );
-
-		playerShipHullMonitor = new PlayerShipHullMonitor( context );
-		playerShipHullMonitor.setPosition( 0, hudStage.getHeight()-playerShipHullMonitor.getHeight() );
-		playerShipHullMonitor.setModel( playerShipModel );
-		hudStage.addActor( playerShipHullMonitor );
-
-		inputMultiplexer = new InputMultiplexer();
-		inputMultiplexer.addProcessor( hudStage );
-		inputMultiplexer.addProcessor( mainStage );
-
-		try {
-			FileHandleResolver resolver = context.getFileHandleResolver();
-			//scriptManager.eval( resolver.resolve( "script.java" ) );
-		}
-		catch ( Exception e ) {
-			log.error( "Error evaluating script.", e );
-		}
-
-		eventManager.addTickListener(new TickListener() {
-			@Override
-			public void ticksAccumulated( TickEvent e ) {
-				//System.out.println( "Tick ("+ e.getTickCount() +")" );
-
-				int hull = playerShipModel.getProperties().getInt( "Hull" );
-				int hullMax = playerShipModel.getProperties().getInt( "HullMax" );
-				if ( hull < hullMax ) {
-					playerShipModel.getProperties().incrementInt( "Hull", 1 );
-				}
-
-				// Eventually a PropertyEvent would have an INC_IF_LESS_THAN flag
-				// or something. Or maybe a sentinel event listener - set to watch
-				// certain property names - vetoing attempts to increment beyond
-				// the names' associated maxes?
-			}
-		});
 	}
 
 
@@ -217,7 +272,7 @@ public class TestScreen implements Disposable, OVDScreen {
 	public void render( float delta ) {
 		if ( renderedPreviousFrame )
 			eventManager.secondsElapsed( delta );
-		eventManager.processEvents();
+		eventManager.processEvents( context );
 
 		Gdx.gl.glClearColor( 0, 0, 0, 0 );
 		Gdx.gl.glClear( GL10.GL_COLOR_BUFFER_BIT );
@@ -230,11 +285,15 @@ public class TestScreen implements Disposable, OVDScreen {
 
 
 		batch.begin();
-		driftSprite.setPosition( 100+100*(float)Math.cos(elapsed), 100+25*(float)Math.sin(elapsed) );
-		driftSprite.draw( batch );
+		if ( driftSprite != null ) {
+			driftSprite.setPosition( 100+100*(float)Math.cos(elapsed), 100+25*(float)Math.sin(elapsed) );
+			driftSprite.draw( batch );
+		}
 
-		TextureRegion walkFrame = walkAnim.getKeyFrame( elapsed, true );
-		batch.draw( walkFrame, 50, 50 );
+		if ( walkAnim != null ) {
+			TextureRegion walkFrame = walkAnim.getKeyFrame( elapsed, true );
+			batch.draw( walkFrame, 50, 50 );
+		}
 		batch.end();
 
 

@@ -27,6 +27,7 @@ import com.badlogic.gdx.utils.Logger;
 import com.ftloverdrive.io.FreeTypeFontLoader;
 import com.ftloverdrive.io.RelativeFileHandleResolver;
 import com.ftloverdrive.io.URIFileHandleResolver;
+import com.ftloverdrive.net.OVDNetManager;
 import com.ftloverdrive.ui.screen.OVDScreenManager;
 import com.ftloverdrive.util.FTLUtilities;
 import com.ftloverdrive.util.OVDReferenceManager;
@@ -50,6 +51,7 @@ public class OverdriveGame implements ApplicationListener {
 	private AssetManager assetManager;
 	private OVDScreenManager screenManager;
 	private OVDReferenceManager refManager;
+	private OVDNetManager netManager;
 	private Screen currentScreen = null;
 
 
@@ -93,12 +95,13 @@ public class OverdriveGame implements ApplicationListener {
 		fileHandleResolver.addDefaultResolver( new InternalFileHandleResolver() );
 
 		refManager = new OVDReferenceManager();
+		netManager = new OVDNetManager();
 
 		assetManager = new AssetManager( fileHandleResolver );
 		assetManager.setLoader( BitmapFont.class, new FreeTypeFontLoader( fileHandleResolver ) );
 
 		OverdriveContext context = new OverdriveContext();
-		context.init( this, null, null );
+		context.init( this, null, -1 );
 		screenManager = new OVDScreenManager( context );
 
 		screenManager.showScreen( screenManager.getInitScreenKey() );
@@ -152,6 +155,13 @@ public class OverdriveGame implements ApplicationListener {
 	 */
 	public OVDReferenceManager getReferenceManager() {
 		return refManager;
+	}
+
+	/**
+	 * Returns a manager to request new reference ids.
+	 */
+	public OVDNetManager getNetManager() {
+		return netManager;
 	}
 
 
