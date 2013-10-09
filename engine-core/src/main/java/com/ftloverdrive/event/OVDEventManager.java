@@ -50,6 +50,7 @@ public class OVDEventManager {
 			OVDEventHandler h = handlerMap.get( event.getClass() );
 			if ( h != null ) {
 				h.handle( context, event, inListenerList.getListenerList() );
+				h.disposeEvent( event );
 			}
 			else {
 				//System.out.println( "Unhandled event: "+ event );
