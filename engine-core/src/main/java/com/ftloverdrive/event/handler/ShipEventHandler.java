@@ -10,6 +10,7 @@ import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
 import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.model.ship.TestShipModel;
+import com.ftloverdrive.util.OVDConstants;
 
 
 public class ShipEventHandler implements OVDEventHandler {
@@ -46,7 +47,7 @@ public class ShipEventHandler implements OVDEventHandler {
 			TestShipModel shipModel = new TestShipModel();
 			int shipRefId = event.getShipRefId();
 			context.getReferenceManager().addObject( shipModel, shipRefId );
-			shipModel.getProperties().setInt( "HullMax", 40 );
+			shipModel.getProperties().setInt( OVDConstants.HULL_MAX, 40 );
 		}
 		else if ( e instanceof ShipPropertyEvent ) {
 			ShipPropertyEvent event = (ShipPropertyEvent)e;

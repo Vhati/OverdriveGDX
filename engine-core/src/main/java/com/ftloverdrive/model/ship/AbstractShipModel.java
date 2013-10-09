@@ -3,6 +3,7 @@ package com.ftloverdrive.model.ship;
 import com.ftloverdrive.model.AbstractOVDModel;
 import com.ftloverdrive.model.NamedProperties;
 import com.ftloverdrive.model.ship.ShipModel;
+import com.ftloverdrive.util.OVDConstants;
 
 
 public class AbstractShipModel extends AbstractOVDModel implements ShipModel {
@@ -12,12 +13,12 @@ public class AbstractShipModel extends AbstractOVDModel implements ShipModel {
 
 	public AbstractShipModel() {
 		super();
-		shipProperties.setInt( "HullMax", 0 );
-		shipProperties.setInt( "Hull", 0 );
-		shipProperties.setInt( "Scrap", 0 );
-		shipProperties.setInt( "Fuel", 0 );
-		shipProperties.setInt( "Missiles", 0 );
-		shipProperties.setInt( "DroneParts", 0 );
+		shipProperties.setInt( OVDConstants.HULL_MAX, 0 );
+		shipProperties.setInt( OVDConstants.HULL, 0 );
+		shipProperties.setInt( OVDConstants.SCRAP, 0 );
+		shipProperties.setInt( OVDConstants.FUEL, 0 );
+		shipProperties.setInt( OVDConstants.MISSILES, 0 );
+		shipProperties.setInt( OVDConstants.DRONE_PARTS, 0 );
 	}
 
 

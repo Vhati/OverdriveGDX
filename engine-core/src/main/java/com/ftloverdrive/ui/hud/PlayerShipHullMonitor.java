@@ -14,6 +14,7 @@ import com.ftloverdrive.event.game.GamePlayerShipChangeListener;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
 import com.ftloverdrive.model.ship.ShipModel;
+import com.ftloverdrive.util.OVDConstants;
 
 
 public class PlayerShipHullMonitor extends Actor implements Disposable, GamePlayerShipChangeListener, ShipPropertyListener {
@@ -77,7 +78,7 @@ public class PlayerShipHullMonitor extends Actor implements Disposable, GamePlay
 		if ( e.getShipRefId() != shipModelRefId ) return;
 
 		if ( e.getPropertyType() == ShipPropertyEvent.INT_TYPE ) {
-			if ( "Hull".equals( e.getPropertyKey() ) || "HullMax".equals( e.getPropertyKey() ) ) {
+			if ( OVDConstants.HULL.equals( e.getPropertyKey() ) || OVDConstants.HULL_MAX.equals( e.getPropertyKey() ) ) {
 				updateShipInfo( context );
 			}
 		}
@@ -93,8 +94,8 @@ public class PlayerShipHullMonitor extends Actor implements Disposable, GamePlay
 		}
 		else {
 			ShipModel shipModel = context.getReferenceManager().getObject( shipModelRefId, ShipModel.class );
-			int hullAmt = shipModel.getProperties().getInt( "Hull" );
-			int hullMax = shipModel.getProperties().getInt( "HullMax" );
+			int hullAmt = shipModel.getProperties().getInt( OVDConstants.HULL );
+			int hullMax = shipModel.getProperties().getInt( OVDConstants.HULL_MAX );
 			if ( hullMax != 0 ) {
 				barClipWidth = Math.min( ((float)hullAmt / hullMax) * barSprite.getWidth(), barSprite.getWidth() );
 			} else {

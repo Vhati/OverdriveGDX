@@ -45,6 +45,7 @@ import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.ui.hud.PlayerShipHullMonitor;
 import com.ftloverdrive.ui.screen.OVDScreen;
 import com.ftloverdrive.ui.screen.OVDStageManager;
+import com.ftloverdrive.util.OVDConstants;
 
 
 public class TestScreen implements Disposable, OVDScreen {
@@ -156,11 +157,11 @@ public class TestScreen implements Disposable, OVDScreen {
 				int shipRefId = gameModel.getPlayerShip();
 				if ( shipRefId != -1 ) {
 					ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
-					int hull = shipModel.getProperties().getInt( "Hull" );
-					int hullMax = shipModel.getProperties().getInt( "HullMax" );
+					int hull = shipModel.getProperties().getInt( OVDConstants.HULL );
+					int hullMax = shipModel.getProperties().getInt( OVDConstants.HULL_MAX );
 					if ( hull < hullMax ) {
 						ShipPropertyEvent event = Pools.get( ShipPropertyEvent.class ).obtain();
-						event.init( shipRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, "Hull", 1 );
+						event.init( shipRefId, ShipPropertyEvent.INT_TYPE, ShipPropertyEvent.INCREMENT_ACTION, OVDConstants.HULL, 1 );
 						context.getScreenEventManager().postDelayedEvent( event );
 					}
 				}
