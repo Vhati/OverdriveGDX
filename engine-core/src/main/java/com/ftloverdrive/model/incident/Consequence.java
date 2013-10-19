@@ -6,6 +6,8 @@ import com.ftloverdrive.core.OverdriveContext;
 /**
  * Something that happens as an Incident triggers.
  *
+ * TODO: Retrofit code to use reference ids and OVDEvents.
+ *
  * TODO: Some possible default classes...
  *
  *   EncounterConsequence (ship event)

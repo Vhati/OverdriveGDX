@@ -1,0 +1,292 @@
+
+floorplan.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+hazard-stripes
+  rotate: false
+  xy: 0, 0
+  size: 35, 35
+  orig: 35, 35
+  offset: 0, 0
+  index: -1
+floor-line
+  rotate: false
+  xy: 27, 44
+  size: 3, 3
+  orig: 3, 3
+  offset: 0, 0
+  index: -1
+floor-tile
+  rotate: false
+  xy: 32, 44
+  size: 3, 3
+  orig: 3, 3
+  offset: 0, 0
+  index: -1
+wall-side-n,s,e,w
+  rotate: false
+  xy: 23, 37
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-nw,ne,sw,se
+  rotate: false
+  xy: 30, 37
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-side-n
+  rotate: false
+  xy: 37, 0
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-side-e
+  rotate: false
+  xy: 44, 0
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-side-s
+  rotate: false
+  xy: 51, 0
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-side-w
+  rotate: false
+  xy: 58, 0
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-side-n,w
+  rotate: false
+  xy: 37, 7
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-side-n,e
+  rotate: false
+  xy: 44, 7
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-side-s,e
+  rotate: false
+  xy: 51, 7
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-side-s,w
+  rotate: false
+  xy: 58, 7
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-side-n,e,w
+  rotate: false
+  xy: 37, 14
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-side-n,s,e
+  rotate: false
+  xy: 44, 14
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-side-s,e,w
+  rotate: false
+  xy: 51, 14
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-side-n,s,w
+  rotate: false
+  xy: 58, 14
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-nw
+  rotate: false
+  xy: 37, 21
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-ne
+  rotate: false
+  xy: 44, 21
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-se
+  rotate: false
+  xy: 51, 21
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-sw
+  rotate: false
+  xy: 58, 21
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-nw,ne
+  rotate: false
+  xy: 37, 28
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-ne,se
+  rotate: false
+  xy: 44, 28
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-sw,se
+  rotate: false
+  xy: 51, 28
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-nw,sw
+  rotate: false
+  xy: 58, 28
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-nw,ne,sw
+  rotate: false
+  xy: 37, 35
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-nw,ne,se
+  rotate: false
+  xy: 44, 35
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-ne,sw,se
+  rotate: false
+  xy: 51, 35
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-nw,sw,se
+  rotate: false
+  xy: 58, 35
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-n,sw
+  rotate: false
+  xy: 37, 42
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-e,nw
+  rotate: false
+  xy: 44, 42
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-s,ne
+  rotate: false
+  xy: 51, 42
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-w,se
+  rotate: false
+  xy: 58, 42
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-n,sw,se
+  rotate: false
+  xy: 37, 49
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-e,nw,ne
+  rotate: false
+  xy: 44, 49
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-s,nw,ne
+  rotate: false
+  xy: 51, 49
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-w,ne,se
+  rotate: false
+  xy: 58, 49
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-n,w,se
+  rotate: false
+  xy: 37, 56
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-n,e,sw
+  rotate: false
+  xy: 44, 56
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-s,e,nw
+  rotate: false
+  xy: 51, 56
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+wall-corner-s,w,ne
+  rotate: false
+  xy: 58, 56
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1

@@ -29,7 +29,6 @@ import com.ftloverdrive.io.RelativeFileHandleResolver;
 import com.ftloverdrive.io.URIFileHandleResolver;
 import com.ftloverdrive.net.OVDNetManager;
 import com.ftloverdrive.ui.screen.OVDScreenManager;
-import com.ftloverdrive.util.FTLUtilities;
 import com.ftloverdrive.util.OVDReferenceManager;
 
 
@@ -53,6 +52,8 @@ public class OverdriveGame implements ApplicationListener {
 	private OVDReferenceManager refManager;
 	private OVDNetManager netManager;
 	private Screen currentScreen = null;
+
+	private com.ftloverdrive.net.NetworkTest networkTest;  // TODO: Remove me.
 
 
 	@Override
@@ -105,6 +106,9 @@ public class OverdriveGame implements ApplicationListener {
 		screenManager = new OVDScreenManager( context );
 
 		screenManager.showScreen( screenManager.getInitScreenKey() );
+
+		networkTest = new com.ftloverdrive.net.NetworkTest();
+		//networkTest.init();
 	}
 
 
@@ -209,5 +213,6 @@ public class OverdriveGame implements ApplicationListener {
 		if ( currentScreen != null ) currentScreen.dispose();
 		screenManager.dispose();
 		assetManager.dispose();
+		networkTest.shutdown();
 	}
 }

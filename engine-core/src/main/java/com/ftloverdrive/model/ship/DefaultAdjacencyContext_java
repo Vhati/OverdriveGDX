@@ -1,0 +1,107 @@
+package com.ftloverdrive.model.ship;
+
+import java.util.Collection;
+
+import com.badlogic.gdx.utils.Pools;
+
+import com.ftloverdrive.core.OverdriveContext
+import com.ftloverdrive.model.ship.ShipCoordinate;
+import com.ftloverdrive.model.ship.ShipLayout;
+
+
+public class DefaultAdjacencyContext {
+
+	/**
+	 * This coordinate gets recycled until it's a returnable result.
+	 * Then this variable will point to a new instance to recycle.
+	 */
+	protected ShipCoordinate tmpCoord;
+	private int i;
+
+
+	public DefaultAdjacencyContext() {
+		ShipCoordinate tmpCoord = Pools.get( ShipCoordinate.class ).obtain();
+	}
+
+
+	/**
+	 * Finds adjacent ShipCoordinates, then adds them to an existing
+	 * Collection.
+	 *
+	 * The coordinate passed to this method will not be added to the results.
+	 */
+	public void getAdjacentCoords( OverdriveContext context, ShipLayout layout, ShipCoordinate coord, Collection<ShipCoordinate> results ) {
+
+		if ( coord.v == 0 ) {
+			// If this is a square.
+
+			int roomModelRefId = layout.getRoomRefIdOfSquareCoords( coord );
+			Set<ShipCoordinate> roomSquareCoords = layout.getRoomSquareCoords( roomModelRefId );
+
+			for ( i=0; i < roomSquareCoords.size(); i++ ) {
+				ShipCoordinate square = roomSquareCoords[i];
+				if ( square.equals( coord ) ) continue;
+
+				tmpCoord.init( coord.x-1, coord.y, 0 );
+				if ( square.equals( tmpCoord ) ) {
+					results.add( square );
+					continue;
+				}
+
+				tmpCoord.init( coord.x, coord.y-1, 0 );
+				if ( square.equals( tmpCoord ) ) {
+					results.add( square );
+					continue;
+				}
+
+				tmpCoord.init( coord.x+1, coord.y, 0 );
+				if ( square.equals( tmpCoord ) ) {
+					results.add( square );
+					continue;
+				}
+
+				tmpCoord.init( coord.x, coord.y+1, 0 );
+				if ( square.equals( tmpCoord ) ) {
+					results.add( square );
+					continue;
+				}
+			}
+			// TODO: Look for doors on the room.
+		}
+		else if ( coord.v == 1 ) {
+			// Horizontal Wall.
+
+			Set<ShipCoordinate> allCoords = layout.getAllShipCoords();
+
+			tmpCoord.init( coord.x, coord.y-1, 0 );
+			if ( allCoords.contains( tmpCoord ) ) {
+				results.add( tmpCoord );
+				tmpCoord = Pools.get( ShipCoordinate.class ).obtain();
+			}
+
+			tmpCoord.init( coord.x, coord.y+1, 0 );
+			if ( allCoords.contains( tmpCoord ) ) {
+				results.add( tmpCoord );
+				tmpCoord = Pools.get( ShipCoordinate.class ).obtain();
+			}
+		}
+		else if ( coord.v == 2 ) {
+			// Vertical Wall.
+
+			Set<ShipCoordinate> allCoords = layout.getAllShipCoords();
+
+			tmpCoord.init( coord.x-1, coord.y, 0 );
+			if ( allCoords.contains( tmpCoord ) ) {
+				results.add( tmpCoord );
+				tmpCoord = Pools.get( ShipCoordinate.class ).obtain();
+			}
+
+			tmpCoord.init( coord.x+1, coord.y, 0 );
+			if ( allCoords.contains( tmpCoord ) ) {
+				results.add( tmpCoord );
+				tmpCoord = Pools.get( ShipCoordinate.class ).obtain();
+			}
+		}
+	}
+
+}

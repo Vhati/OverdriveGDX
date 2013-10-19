@@ -6,8 +6,15 @@ import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEvent;
 import com.ftloverdrive.event.OVDEventHandler;
 import com.ftloverdrive.event.ship.ShipCreationEvent;
+import com.ftloverdrive.event.ship.ShipLayoutRoomAddEvent;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
+import com.ftloverdrive.event.ship.ShipRoomCreationEvent;
+import com.ftloverdrive.event.ship.ShipRoomImageChangeEvent;
+import com.ftloverdrive.io.ImageSpec;
+import com.ftloverdrive.model.ship.DefaultRoomModel;
+import com.ftloverdrive.model.ship.RoomModel;
+import com.ftloverdrive.model.ship.ShipCoordinate;
 import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.model.ship.TestShipModel;
 import com.ftloverdrive.util.OVDConstants;
@@ -21,9 +28,14 @@ public class ShipEventHandler implements OVDEventHandler {
 	public ShipEventHandler() {
 		eventClasses = new Class[] {
 			ShipCreationEvent.class,
-			ShipPropertyEvent.class
+			ShipPropertyEvent.class,
+			ShipLayoutRoomAddEvent.class,
+			ShipRoomCreationEvent.class,
+			ShipRoomImageChangeEvent.class
 		};
-		listenerClasses = new Class[] { ShipPropertyListener.class };
+		listenerClasses = new Class[] {
+			ShipPropertyListener.class
+		};
 	}
 
 
@@ -44,10 +56,9 @@ public class ShipEventHandler implements OVDEventHandler {
 		if ( e instanceof ShipCreationEvent ) {
 			ShipCreationEvent event = (ShipCreationEvent)e;
 
-			TestShipModel shipModel = new TestShipModel();
 			int shipRefId = event.getShipRefId();
+			ShipModel shipModel = new TestShipModel();
 			context.getReferenceManager().addObject( shipModel, shipRefId );
-			shipModel.getProperties().setInt( OVDConstants.HULL_MAX, 40 );
 		}
 		else if ( e instanceof ShipPropertyEvent ) {
 			ShipPropertyEvent event = (ShipPropertyEvent)e;
@@ -73,6 +84,35 @@ public class ShipEventHandler implements OVDEventHandler {
 				}
 			}
 		}
+		else if ( e instanceof ShipRoomCreationEvent ) {
+			ShipRoomCreationEvent event = (ShipRoomCreationEvent)e;
+
+			int roomRefId = event.getRoomRefId();
+			RoomModel roomModel = new DefaultRoomModel();
+			context.getReferenceManager().addObject( roomModel, roomRefId );
+		}
+		else if ( e instanceof ShipRoomImageChangeEvent ) {
+			ShipRoomImageChangeEvent event = (ShipRoomImageChangeEvent)e;
+
+			if ( event.getEventType() == ShipRoomImageChangeEvent.DECOR ) {
+				int roomRefId = event.getRoomRefId();
+				ImageSpec imageSpec = event.getImageSpec();
+				RoomModel roomModel = context.getReferenceManager().getObject( roomRefId, RoomModel.class );
+
+				roomModel.setRoomDecorImageSpec( imageSpec );
+			}
+		}
+		else if ( e instanceof ShipLayoutRoomAddEvent ) {
+			ShipLayoutRoomAddEvent event = (ShipLayoutRoomAddEvent)e;
+
+			int shipRefId = event.getShipRefId();
+			ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
+			int roomRefId = event.getRoomRefId();
+			//RoomModel roomModel = context.getReferenceManager().getObject( roomRefId, RoomModel.class );
+			ShipCoordinate[] roomCoords = event.getRoomCoords();
+
+			shipModel.getLayout().addRoom( roomRefId, roomCoords );
+		}
 	}
 
 
@@ -84,6 +124,15 @@ public class ShipEventHandler implements OVDEventHandler {
 		}
 		else if ( e.getClass() == ShipPropertyEvent.class ) {
 			Pools.get( ShipPropertyEvent.class ).free( (ShipPropertyEvent)e );
+		}
+		else if ( e.getClass() == ShipRoomCreationEvent.class ) {
+			Pools.get( ShipRoomCreationEvent.class ).free( (ShipRoomCreationEvent)e );
+		}
+		else if ( e.getClass() == ShipRoomImageChangeEvent.class ) {
+			Pools.get( ShipRoomImageChangeEvent.class ).free( (ShipRoomImageChangeEvent)e );
+		}
+		else if ( e.getClass() == ShipLayoutRoomAddEvent.class ) {
+			Pools.get( ShipLayoutRoomAddEvent.class ).free( (ShipLayoutRoomAddEvent)e );
 		}
 	}
 }

@@ -12,6 +12,8 @@ import com.ftloverdrive.model.incident.PlotBranch;
 
 /**
  * What the original game referred to as an event.
+ *
+ * TODO: Retrofit code to use reference ids and OVDEvents.
  */
 public abstract class AbstractIncidentModel extends AbstractOVDModel implements IncidentModel {
 

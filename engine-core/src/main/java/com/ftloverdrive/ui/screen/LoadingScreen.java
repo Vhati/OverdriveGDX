@@ -21,6 +21,7 @@ import com.ftloverdrive.event.OVDEventManager;
 import com.ftloverdrive.script.OVDScriptManager;
 import com.ftloverdrive.ui.screen.OVDScreen;
 import com.ftloverdrive.ui.screen.OVDStageManager;
+import com.ftloverdrive.util.OVDConstants;
 
 
 public class LoadingScreen implements Disposable, OVDScreen {
@@ -90,15 +91,16 @@ public class LoadingScreen implements Disposable, OVDScreen {
 		//mainStage.addActor( logo );
 
 		// Uncomment to preload textures.
-		//context.getAssetManager().load( "img/buttons/FTL/pack.atlas", TextureAtlas.class );
-		//context.getAssetManager().load( "img/combatUI/pack.atlas", TextureAtlas.class );
-		context.getAssetManager().load( "img/effects/pack.atlas", TextureAtlas.class );
-		context.getAssetManager().load( "img/icons/pack.atlas", TextureAtlas.class );
-		context.getAssetManager().load( "img/people/pack.atlas", TextureAtlas.class );
-		//context.getAssetManager().load( "img/ship/pack.atlas", TextureAtlas.class );
-		context.getAssetManager().load( "img/statusUI/pack.atlas", TextureAtlas.class );
-		context.getAssetManager().load( "img/systemUI/pack.atlas", TextureAtlas.class );
-		//context.getAssetManager().load( "img/weapons/pack.atlas", TextureAtlas.class );
+		//context.getAssetManager().load( OVDConstants.BUTTONS_FTL_ATLAS, TextureAtlas.class );
+		//context.getAssetManager().load( OVDConstants.COMBATUI_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.EFFECTS_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.ICONS_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.PEOPLE_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.SHIP_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.SHIP_INTERIOR_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.STATUSUI_ATLAS, TextureAtlas.class );
+		context.getAssetManager().load( OVDConstants.SYSTEMUI_ATLAS, TextureAtlas.class );
+		//context.getAssetManager().load( OVDConstants.WEAPONS_ATLAS, TextureAtlas.class );
 	}
 
 

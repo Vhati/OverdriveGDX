@@ -11,6 +11,8 @@ import com.ftloverdrive.model.incident.PlotBranch;
 /**
  * What the original game referred to as an event.
  *
+ * TODO: Retrofit code to use reference ids and OVDEvents.
+ *
  * TODO: A DeferredIncidentModel class, which constructs a named Incident
  * at the last minute, probably from an IncidentBlueprint. That would make
  * event loops possible.

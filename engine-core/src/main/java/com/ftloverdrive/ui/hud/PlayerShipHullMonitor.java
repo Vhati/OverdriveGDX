@@ -18,7 +18,6 @@ import com.ftloverdrive.util.OVDConstants;
 
 
 public class PlayerShipHullMonitor extends Actor implements Disposable, GamePlayerShipChangeListener, ShipPropertyListener {
-	protected static final String STATUSUI_ATLAS = "img/statusUI/pack.atlas";
 
 	protected AssetManager assetManager;
 	protected Sprite bgSprite;
@@ -31,9 +30,9 @@ public class PlayerShipHullMonitor extends Actor implements Disposable, GamePlay
 		super();
 		assetManager = context.getAssetManager();
 
-		assetManager.load( STATUSUI_ATLAS, TextureAtlas.class );
+		assetManager.load( OVDConstants.STATUSUI_ATLAS, TextureAtlas.class );
 		assetManager.finishLoading();
-		TextureAtlas statusUIAtlas = assetManager.get( STATUSUI_ATLAS, TextureAtlas.class );
+		TextureAtlas statusUIAtlas = assetManager.get( OVDConstants.STATUSUI_ATLAS, TextureAtlas.class );
 
 		bgSprite = statusUIAtlas.createSprite( "top-hull" );
 		this.setWidth( bgSprite.getWidth() );
@@ -45,6 +44,8 @@ public class PlayerShipHullMonitor extends Actor implements Disposable, GamePlay
 
 	@Override
 	public void draw( SpriteBatch batch, float parentAlpha ) {
+		super.draw( batch, parentAlpha );
+
 		//Color color = getColor();
 		//batch.setColor( color.r, color.g, color.b, color.a * parentAlpha );
 
@@ -108,6 +109,6 @@ public class PlayerShipHullMonitor extends Actor implements Disposable, GamePlay
 	// Actors don't normally have a dispose().
 	@Override
 	public void dispose() {
-		assetManager.unload( STATUSUI_ATLAS );
+		assetManager.unload( OVDConstants.STATUSUI_ATLAS );
 	}
 }

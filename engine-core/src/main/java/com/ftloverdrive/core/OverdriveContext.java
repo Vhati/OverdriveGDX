@@ -18,7 +18,6 @@ import com.ftloverdrive.util.OVDReferenceManager;
  * A means to pass the numerous managers around, especially to callbacks.
  *
  * This should be preferred over globals.
- * It's not necessary to set every value.
  *
  * It might make sense for an object of limited scope to take context as an
  * arg in its constructor and remember it. But if possible, individual

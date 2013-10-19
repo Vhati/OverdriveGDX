@@ -15,15 +15,18 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.Pools;
 
+import com.ftloverdrive.blueprint.ship.TestShipBlueprint;
 import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.event.OVDEventManager;
 import com.ftloverdrive.event.TickEvent;
@@ -33,7 +36,6 @@ import com.ftloverdrive.event.game.GamePlayerShipChangeListener;
 import com.ftloverdrive.event.handler.GameEventHandler;
 import com.ftloverdrive.event.handler.ShipEventHandler;
 import com.ftloverdrive.event.handler.TickEventHandler;
-import com.ftloverdrive.event.ship.ShipCreationEvent;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
 import com.ftloverdrive.model.DefaultGameModel;
@@ -45,6 +47,7 @@ import com.ftloverdrive.ui.ShatteredImage;
 import com.ftloverdrive.ui.hud.PlayerShipHullMonitor;
 import com.ftloverdrive.ui.screen.OVDScreen;
 import com.ftloverdrive.ui.screen.OVDStageManager;
+import com.ftloverdrive.ui.ship.ShipActor;
 import com.ftloverdrive.util.OVDConstants;
 
 
@@ -72,10 +75,12 @@ public class TestScreen implements Disposable, OVDScreen {
 	private InputMultiplexer inputMultiplexer;
 	private Stage mainStage;
 	private Stage hudStage;
+	private Stage popupStage;
 
 	private Sprite driftSprite = null;
 	private Animation walkAnim = null;
 	private PlayerShipHullMonitor playerShipHullMonitor;
+	private ShipActor shipActor;
 
 	private OverdriveContext context;
 
@@ -95,6 +100,56 @@ public class TestScreen implements Disposable, OVDScreen {
 		stageManager.putStage( "Main", mainStage );
 		hudStage = new Stage();
 		stageManager.putStage( "HUD", hudStage );
+		popupStage = new Stage();
+		stageManager.putStage( "Popup", popupStage );
+
+		// These layers are mainly notes. Many will probably be moved inside
+		// actors.
+		Array<String> mainLayerNames = new Array<String>();
+		mainLayerNames.add( "Background" );
+		mainLayerNames.add( "BackgroundAccent" );  // Planet.
+		mainLayerNames.add( "ShipShield" );
+		mainLayerNames.add( "ShipGib" );
+		mainLayerNames.add( "ShipWeapon" );
+		mainLayerNames.add( "ShipBase" );
+		mainLayerNames.add( "ShipFloor" );
+		mainLayerNames.add( "ShipFloorSheen" );  // Oxygen stripes.
+		mainLayerNames.add( "ShipRoomDecor" );
+		mainLayerNames.add( "ShipRoomAccent" );  // Terminal.
+		mainLayerNames.add( "ShipBreach" );
+		mainLayerNames.add( "ShipFire" );
+		mainLayerNames.add( "ShipSystemIcon" );
+		mainLayerNames.add( "ShipPersonnelDot" );  // Sensor blip or walk target.
+		mainLayerNames.add( "ShipPersonnel" );
+		mainLayerNames.add( "ShipWall" );
+		mainLayerNames.add( "ShipDoor" );
+		mainLayerNames.add( "Satellite" );  // Flying drones.
+		mainLayerNames.add( "Debris" );  // Crystal lockdown chunks. Explosions.
+		for ( String layerName : mainLayerNames ) {
+			Group tmpGroup = new Group();
+			tmpGroup.setName( layerName );
+			mainStage.getRoot().addActor( tmpGroup );
+		}
+
+		Array<String> hudLayerNames = new Array<String>();
+		hudLayerNames.add( "Warning" );  // "Danger", "Intruders Detected" and "O2 Low".
+		hudLayerNames.add( "UnitStatus" );  // Health bars over crew.
+		hudLayerNames.add( "ShipDoorHighlight" );
+		hudLayerNames.add( "FloatyDamageNumber" );  // When hit.
+		hudLayerNames.add( "Beam" );
+		hudLayerNames.add( "Reticle" );
+		hudLayerNames.add( "CtrlPanel" );
+		for ( String layerName : hudLayerNames ) {
+			Group tmpGroup = new Group();
+			tmpGroup.setName( layerName );
+			hudStage.getRoot().addActor( tmpGroup );
+		}
+
+		// Layers can be looked up with stage.getRoot().findActor( layerName );
+		// A layer can be inserted like this...
+		//   Group stageRoot = stage.getRoot();
+		//   Group lowerLayer = (Group)stageRoot.findActor( layerName );
+		//   stageRoot.addActorAfter( lowerLayer, newGroup );
 
 		context.getAssetManager().load( BKG_ATLAS, TextureAtlas.class );
 		context.getAssetManager().load( ROOT_ATLAS, TextureAtlas.class );
@@ -107,7 +162,7 @@ public class TestScreen implements Disposable, OVDScreen {
 		ShatteredImage bgImage = new ShatteredImage( bgAtlas.findRegions( "bg-dullstars" ), 5 );
 		bgImage.setFillParent( true );
 		bgImage.setPosition( 0, 0 );
-		mainStage.addActor( bgImage );
+		((Group)mainStage.getRoot().findActor( "Background" )).addActor( bgImage );
 
 		textWindowDemo();
 
@@ -126,7 +181,12 @@ public class TestScreen implements Disposable, OVDScreen {
 		playerShipHullMonitor.setPosition( 0, hudStage.getHeight()-playerShipHullMonitor.getHeight() );
 		hudStage.addActor( playerShipHullMonitor );
 
+		shipActor = new ShipActor( context );
+		shipActor.setPosition( 200, 100 );  // TODO: Magic numbers (~200x200 on 1280x768).
+		mainStage.addActor( shipActor );
+
 		inputMultiplexer = new InputMultiplexer();
+		inputMultiplexer.addProcessor( popupStage );
 		inputMultiplexer.addProcessor( hudStage );
 		inputMultiplexer.addProcessor( mainStage );
 
@@ -146,6 +206,9 @@ public class TestScreen implements Disposable, OVDScreen {
 
 		eventManager.addEventListener( playerShipHullMonitor, GamePlayerShipChangeListener.class );
 		eventManager.addEventListener( playerShipHullMonitor, ShipPropertyListener.class );
+
+		eventManager.addEventListener( shipActor, GamePlayerShipChangeListener.class );
+		eventManager.addEventListener( shipActor, ShipPropertyListener.class );
 
 		// When there's a ship, increment its hull after every tick.
 		eventManager.addEventListener(new TickListener() {
@@ -175,10 +238,7 @@ public class TestScreen implements Disposable, OVDScreen {
 
 
 		// Create a test ship.
-		int shipRefId = context.getNetManager().requestNewRefId();
-		ShipCreationEvent shipCreateEvent = Pools.get( ShipCreationEvent.class ).obtain();
-		shipCreateEvent.init( shipRefId, "Test" );
-		eventManager.postDelayedEvent( shipCreateEvent );
+		int shipRefId = new TestShipBlueprint().createShip( context );
 
 		// Set it as the player's ship.
 		GamePlayerShipChangeEvent shipChangeEvent = Pools.get( GamePlayerShipChangeEvent.class ).obtain();
@@ -211,7 +271,7 @@ public class TestScreen implements Disposable, OVDScreen {
 		plotDlg.setKeepWithinStage( true );
 		plotDlg.setMovable( true );
 		plotDlg.setSize( 200, 250 );
-		plotDlg.setPosition( 300, 100 );
+		plotDlg.setPosition( 765, 60 );
 
 		plotDlg.row().top().expand().fill();
 		Label plotLbl = new Label( loremIpsum, new Label.LabelStyle( plotFont, new Color( 1f, 1f, 1f, 1f ) ) );
@@ -219,7 +279,8 @@ public class TestScreen implements Disposable, OVDScreen {
 		plotLbl.setWrap( true );
 		plotDlg.add( plotLbl );
 
-		hudStage.addActor( plotDlg );
+		// setKeepWithinStage() only applies if added to the stage root. :/
+		popupStage.addActor( plotDlg );
 	}
 
 	private void movingSpriteDemo() {
@@ -281,7 +342,7 @@ public class TestScreen implements Disposable, OVDScreen {
 		if ( renderedPreviousFrame )
 			elapsed += delta;
 
-		mainStage.act( Gdx.graphics.getDeltaTime() );
+		mainStage.act( delta );
 		mainStage.draw();
 
 
@@ -298,8 +359,11 @@ public class TestScreen implements Disposable, OVDScreen {
 		batch.end();
 
 
-		hudStage.act( Gdx.graphics.getDeltaTime() );
+		hudStage.act( delta );
 		hudStage.draw();
+
+		popupStage.act( delta );
+		popupStage.draw();
 
 		renderedPreviousFrame = true;
 	}
@@ -319,6 +383,7 @@ public class TestScreen implements Disposable, OVDScreen {
 	public void dispose() {
 		hudStage.dispose();
 		playerShipHullMonitor.dispose();
+		shipActor.dispose();
 		context.getAssetManager().unload( BKG_ATLAS );
 		context.getAssetManager().unload( ROOT_ATLAS );
 		context.getAssetManager().unload( MISC_ATLAS );

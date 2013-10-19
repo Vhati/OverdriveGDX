@@ -7,6 +7,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
 
+/**
+ * Not used.
+ */
 public class TextureUtilities {
 
 	// These methods were early experiments. PixmapPacker is recommended.
