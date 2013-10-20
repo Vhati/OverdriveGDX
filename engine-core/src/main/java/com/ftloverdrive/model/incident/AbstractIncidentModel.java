@@ -26,6 +26,7 @@ public abstract class AbstractIncidentModel extends AbstractOVDModel implements 
 	}
 
 
+	@Override
 	public abstract String getIncidentId();
 
 

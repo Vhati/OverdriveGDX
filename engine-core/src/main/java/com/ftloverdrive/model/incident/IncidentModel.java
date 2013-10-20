@@ -19,7 +19,7 @@ import com.ftloverdrive.model.incident.PlotBranch;
  */
 public interface IncidentModel extends OVDModel {
 
-	/** Returns a unique identifier for this Incident.
+	/** Returns a unique identifier for this Incident. */
 	public String getIncidentId();
 
 
