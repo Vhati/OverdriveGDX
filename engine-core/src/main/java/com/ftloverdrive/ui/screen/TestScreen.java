@@ -39,7 +39,9 @@ import com.ftloverdrive.event.handler.TickEventHandler;
 import com.ftloverdrive.event.ship.ShipPropertyEvent;
 import com.ftloverdrive.event.ship.ShipPropertyListener;
 import com.ftloverdrive.model.DefaultGameModel;
+import com.ftloverdrive.model.DefaultPlayerModel;
 import com.ftloverdrive.model.GameModel;
+import com.ftloverdrive.model.PlayerModel;
 import com.ftloverdrive.model.ship.ShipModel;
 import com.ftloverdrive.model.ship.TestShipModel;
 import com.ftloverdrive.script.OVDScriptManager;
@@ -172,9 +174,14 @@ public class TestScreen implements Disposable, OVDScreen {
 
 		batch = new SpriteBatch();
 
-		GameModel gameModel = new DefaultGameModel();
+		int playerRefId = context.getNetManager().requestNewRefId();
+		PlayerModel playerModel = new DefaultPlayerModel();
+		context.getReferenceManager().addObject( playerModel, playerRefId );
+		context.getNetManager().setLocalPlayerRefId( playerRefId );
+
 		int gameRefId = context.getNetManager().requestNewRefId();
-		context.getReferenceManager().addObject( gameModel, 0 );
+		GameModel gameModel = new DefaultGameModel();
+		context.getReferenceManager().addObject( gameModel, gameRefId );
 		context.setGameModelRefId( gameRefId );
 
 		playerShipHullMonitor = new PlayerShipHullMonitor( context );
@@ -217,7 +224,7 @@ public class TestScreen implements Disposable, OVDScreen {
 				//System.out.println( "Tick ("+ e.getTickCount() +")" );
 
 				GameModel gameModel = context.getReferenceManager().getObject( context.getGameModelRefId(), GameModel.class );
-				int shipRefId = gameModel.getPlayerShip();
+				int shipRefId = gameModel.getPlayerShip( context.getNetManager().getLocalPlayerRefId() );
 				if ( shipRefId != -1 ) {
 					ShipModel shipModel = context.getReferenceManager().getObject( shipRefId, ShipModel.class );
 					int hull = shipModel.getProperties().getInt( OVDConstants.HULL );
@@ -242,7 +249,7 @@ public class TestScreen implements Disposable, OVDScreen {
 
 		// Set it as the player's ship.
 		GamePlayerShipChangeEvent shipChangeEvent = Pools.get( GamePlayerShipChangeEvent.class ).obtain();
-		shipChangeEvent.init( gameRefId, shipRefId );
+		shipChangeEvent.init( gameRefId, playerRefId, shipRefId );
 		eventManager.postDelayedEvent( shipChangeEvent );
 
 

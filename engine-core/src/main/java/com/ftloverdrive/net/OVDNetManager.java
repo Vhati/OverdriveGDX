@@ -4,8 +4,10 @@ import com.badlogic.gdx.utils.Array;
 
 
 public class OVDNetManager {
+
 	protected Array<Range> idRanges;
 	protected int nextId = 0;
+	protected int localPlayerModelRefId = -1;
 
 
 	public OVDNetManager() {
@@ -53,6 +55,18 @@ public class OVDNetManager {
 			// TODO: Make a synchronous RMI call to fetch a new range.
 		}
 		return nextId++;
+	}
+
+
+	/**
+	 * Sets the reference id for the local PlayerModel.
+	 */
+	public void setLocalPlayerRefId( int playerModelRefId ) {
+		localPlayerModelRefId = playerModelRefId;
+	}
+
+	public int getLocalPlayerRefId() {
+		return localPlayerModelRefId;
 	}
 
 

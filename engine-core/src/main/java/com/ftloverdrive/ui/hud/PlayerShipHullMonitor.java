@@ -71,6 +71,10 @@ public class PlayerShipHullMonitor extends Actor implements Disposable, GamePlay
 
 	@Override
 	public void gamePlayerShipChanged( OverdriveContext context, GamePlayerShipChangeEvent e ) {
+		if ( e.getPlayerRefId() != context.getNetManager().getLocalPlayerRefId() ) {
+			return;
+		}
+
 		setShipModel( context, e.getShipRefId() );
 	}
 

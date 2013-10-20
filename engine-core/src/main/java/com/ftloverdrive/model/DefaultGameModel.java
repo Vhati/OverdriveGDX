@@ -1,21 +1,20 @@
 package com.ftloverdrive.model;
 
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntIntMap;
 
-import com.ftloverdrive.core.OverdriveContext;
 import com.ftloverdrive.model.AbstractOVDModel;
 import com.ftloverdrive.model.NamedProperties;
-import com.ftloverdrive.model.ship.ShipModel;
 
 
 public class DefaultGameModel extends AbstractOVDModel implements GameModel {
 
 	protected NamedProperties gameProperties = new NamedProperties();
-	protected int playerShipModelRefId = -1;
+	protected IntIntMap playerRefIdToShipRefIdMap;
 
 
 	public DefaultGameModel() {
 		super();
+		playerRefIdToShipRefIdMap = new IntIntMap();
 	}
 
 
@@ -29,12 +28,12 @@ public class DefaultGameModel extends AbstractOVDModel implements GameModel {
 
 
 	@Override
-	public void setPlayerShip( int shipModelRefId ) {
-		playerShipModelRefId = shipModelRefId;
+	public void setPlayerShip( int playerModelRefId, int shipModelRefId ) {
+		playerRefIdToShipRefIdMap.put( playerModelRefId, shipModelRefId );
 	}
 
 	@Override
-	public int getPlayerShip() {
-		return playerShipModelRefId;
+	public int getPlayerShip( int playerModelRefId ) {
+		return playerRefIdToShipRefIdMap.get( playerModelRefId, -1 );
 	}
 }

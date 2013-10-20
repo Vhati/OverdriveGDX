@@ -121,6 +121,10 @@ public class ShipActor extends Group implements Disposable, GamePlayerShipChange
 
 	@Override
 	public void gamePlayerShipChanged( OverdriveContext context, GamePlayerShipChangeEvent e ) {
+		if ( e.getPlayerRefId() != context.getNetManager().getLocalPlayerRefId() ) {
+			return;
+		}
+
 		setShipModel( context, e.getShipRefId() );
 	}
 
