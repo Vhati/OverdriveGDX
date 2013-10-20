@@ -27,7 +27,7 @@ public class ShipLayout {
 
 
 	/**
-	 * Associates a room with ShipCoordinates of squares and walls.
+	 * Associates a RoomModel with ShipCoordinates of squares and walls.
 	 */
 	public void addRoom( int roomModelRefId, ShipCoordinate[] roomCoords ) {
 		allShipCoords.addAll( Arrays.asList( roomCoords ) );
