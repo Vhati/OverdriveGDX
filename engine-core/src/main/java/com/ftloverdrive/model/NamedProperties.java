@@ -17,19 +17,15 @@ public class NamedProperties {
 
 	public static final int INT_TYPE = 0;
 
-	/* A null array to be shared by all instances without observers. */
-	private final static PropertiesObserver[] NULL_PROPERTIES_OBSERVER_ARRAY = new PropertiesObserver[0];
-
-
 	/** Lazily initialized map of named integers. */
 	protected Map<String,MutableInt> namedIntMap = null;
 
 	/** Lazily initialized map of named integers' keys. */
 	protected Set<String> namedIntKeysView = null;
 
-	/** Lazily initialized list of PropertiesObservers. */
-	protected Array<PropertiesObserver> propertiesObservers = null;
 
+	public NamedProperties() {
+	}
 
 	/**
 	 * Sets a named integer variable.
@@ -47,7 +43,6 @@ public class NamedProperties {
 		}
 
 		value.set( n );
-		firePropertyChanged( INT_TYPE, key );
 	}
 
 	/**
@@ -66,7 +61,6 @@ public class NamedProperties {
 		}
 
 		value.increment( n );
-		firePropertyChanged( INT_TYPE, key );
 	}
 
 	/**
@@ -97,33 +91,5 @@ public class NamedProperties {
 			namedIntKeysView = Collections.unmodifiableSet( namedIntMap.keySet() );
 		}
 		return namedIntKeysView;
-	}
-
-
-	public void addPropertiesObserver( PropertiesObserver o ) {
-		if ( propertiesObservers == null ) {
-			propertiesObservers = new Array<PropertiesObserver>( false, 1 );
-		}
-		propertiesObservers.add( o );
-	}
-
-	public void removePropertiesObserver( PropertiesObserver o ) {
-		if ( propertiesObservers == null ) return;
-		propertiesObservers.removeValue( o, true );
-	}
-
-	public PropertiesObserver[] getPropertiesObservers() {
-		if ( propertiesObservers == null ) return NULL_PROPERTIES_OBSERVER_ARRAY;
-		return propertiesObservers.toArray( PropertiesObserver.class );
-	}
-
-	/**
-	 * Directly notifies observers that something changed.
-	 * 
-	 */
-	protected void firePropertyChanged( int type, String key ) {
-		for ( PropertiesObserver o : getPropertiesObservers() ) {
-			o.propertyChanged( this, type, key );
-		}
 	}
 }
